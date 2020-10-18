@@ -1,21 +1,20 @@
 import React from 'react'
-import { Box, Button, Flex, FlexProps, Heading } from 'rebass'
+import { Link, LinkProps, NavLink } from 'react-router-dom'
+import { Box, Button, ButtonProps, Flex, FlexProps, Heading } from 'rebass'
 
 interface Props {
-    
+
 }
 
 export const Home = (props: Props) => {
 
-    var Hero = ({children}: FlexProps) => {
+    var Hero = ({ children }: FlexProps) => {
 
         var heroClass: FlexProps = {
             height: ['100vh'],
-            pt:4,
+            pt: 4,
             color: 'primaryContrast',
-            sx: {
-                background: 'linear-gradient(45deg, #ff416c, #ff4b2b)',
-            }
+            variant: 'gradient',
         }
 
         var imageClass: FlexProps = {
@@ -38,17 +37,33 @@ export const Home = (props: Props) => {
         )
     }
 
+    var LinkButton = (props: LinkProps & ButtonProps) => {
+        var LinkBtn = (p: ButtonProps) => <Button {...props} />
+        return (
+            <NavLink component={LinkBtn} {...props}>
+            </NavLink>
+        )
+    }
+
     return (
         <div>
             <Hero>
                 <Flex m='auto' mt={[5, 'auto']} flexDirection={['column-reverse', 'row']} width='100%' px={5}>
-                    <Box width={[1, 1/2]}></Box>
-                    <Box width={[1, 1/2]}>
-                        <Heading fontSize={64}>Perform</Heading>
-                        <Heading fontSize={32} fontWeight='lighter' mb={5}><em>Commit</em> to be fit. 💪</Heading>
-                        <Flex width={['100%', 'inherit']}>
-                            <Button variant='primary.hero.first' mr="2" flex='1'>Sign In</Button>
-                            <Button variant='primary.hero.second' flex='1'>Log In</Button>   
+                    <Box width={[1, 1 / 2]}></Box>
+                    <Box width={[1, 1 / 2]}>
+                        <Heading fontSize={64}>Perform.</Heading>
+                        <Heading fontSize={32} fontWeight={500} mb={5}><em>Commit</em> to be fit. <span role='img'>💪</span></Heading>
+                        <Flex width={['100%', '75%']}>
+                            <Link to='/exercices' title="Exercices">
+                                <Button variant='primary.hero.first' mr="2" flex='1'>
+                                    Start Training
+                                </Button>
+                            </Link>
+                            <Link to='/exercices' title="Exercices">
+                                <Button variant='primary.hero.second' mr="2" flex='1'>
+                                    See exercices
+                                </Button>
+                            </Link>
                         </Flex>
                     </Box>
                 </Flex>

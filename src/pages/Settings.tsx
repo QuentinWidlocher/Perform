@@ -2,12 +2,12 @@ import React from 'react'
 import { Box } from 'rebass'
 
 interface Props {
-    
+
 }
 
 export const Settings = (props: Props) => {
     return (
-        <Box backgroundColor='primary'>
+        <Box>
             <h1>Settings</h1>
         </Box>
     )

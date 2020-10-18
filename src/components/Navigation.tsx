@@ -1,6 +1,6 @@
 import React, { FC } from "react"
-import { BrowserRouter as Router, Link, NavLink, Route, Switch } from 'react-router-dom';
-import { Box, BoxProps, Flex, Link as RebassLink, LinkProps as RebassLinkProps } from 'rebass';
+import { NavLink, Route, Switch } from 'react-router-dom';
+import { Box, BoxProps, Flex, FlexProps, Heading, Link as RebassLink, LinkProps as RebassLinkProps } from 'rebass';
 
 export type LinkItem = {
   name: string | JSX.Element,
@@ -10,41 +10,58 @@ export type LinkItem = {
 }
 
 export type NavbarProps = {
-    links: LinkItem[]
+  links: LinkItem[],
+  onHero: boolean,
 }
 
-export var Navbar = ({links}: NavbarProps) => {
+export function Navbar({ links, onHero }: NavbarProps) {
 
-    var liStyle: BoxProps = {
-      as: 'li',
-      fontSize: '2rem',
-      p: 3,
-      sx: {
-        listStyle: 'none', 
-      }
+  var navStyle: FlexProps = {
+    as: 'nav',
+    width: '100vw',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: ['column', 'row', 'row'],
+    sx: {
+      position: onHero ? 'absolute' : 'relative'
     }
+  }
 
-    var aStyle: RebassLinkProps = {
-        color: 'white',
-        sx: {
-          textDecoration: 'none'
-        }
+  var liStyle: BoxProps = {
+    as: 'li',
+    fontSize: '2rem',
+    py: 3,
+    sx: {
+      listStyle: 'none',
     }
+  }
 
-    var activeLink = {
-        display: 'none'
+  var aStyle: RebassLinkProps = {
+    color: onHero ? 'white' : 'primary',
+    p: 3,
+    sx: {
+      textDecoration: 'none'
     }
+  }
 
-    var CustomLink = (props: RebassLinkProps) => <RebassLink {...{...aStyle, ...props}}/>
+  var activeLink = {
+    display: 'none'
+  }
 
-    var routerLinks = links.map(({name, url}) => (
-      <Box {...liStyle}>
-        <NavLink to={url} component={CustomLink} activeStyle={activeLink} exact={true}>{name}</NavLink>
-      </Box>
-    ))
+  var CustomLink = (props: RebassLinkProps) => <RebassLink {...{ ...aStyle, ...props }} />
 
-    return (
-    <Flex as='nav' width='100vw' justifyContent='flex-end' sx={{position: 'absolute'}}>
+  var routerLinks = links.map(({ name, url }) => (
+    <Box {...liStyle}>
+      <NavLink to={url} component={CustomLink} activeStyle={activeLink} exact={true}>{name}</NavLink>
+    </Box>
+  ))
+
+  var Title = () => onHero ? null : <Heading color='primary' mr='auto' p={3}>Perform.</Heading>
+
+  return (
+    <Flex {...navStyle}>
+      <Title />
       <Flex as='ul' justifyContent='space-around' p={0} m={0}>
         {routerLinks}
       </Flex>
@@ -53,15 +70,15 @@ export var Navbar = ({links}: NavbarProps) => {
 }
 
 export type RouterOutletProps = {
-    links: LinkItem[]
+  links: LinkItem[]
 }
 
-export var RouterOutlet = ({links}: RouterOutletProps) => {
-    var routerPages = links.map(({url, page}) => (
-      <Route path={url} exact key={url}>{page}</Route>
-    ))
+export function RouterOutlet({ links }: RouterOutletProps) {
+  var routerPages = links.map(({ url, page }) => (
+    <Route path={url} exact key={url}>{page}</Route>
+  ))
 
-    return (
+  return (
     <Switch>
       {routerPages}
     </Switch>
