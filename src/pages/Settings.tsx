@@ -1,4 +1,5 @@
 import React from 'react'
+import { Box } from 'rebass'
 
 interface Props {
     
@@ -6,8 +7,8 @@ interface Props {
 
 export const Settings = (props: Props) => {
     return (
-        <div>
+        <Box backgroundColor='primary'>
             <h1>Settings</h1>
-        </div>
+        </Box>
     )
 }

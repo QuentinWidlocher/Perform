@@ -15,6 +15,7 @@ export var theme = {
     primaryLight: '#ff7961',
     primaryDark: '#ba000d'
   },
+  borderWidth,
   space: [  
     0, `${0.25*spacer}rem`, `${0.5*spacer}rem`, `${1*spacer}rem`, `${1.5*spacer}rem`, `${3*spacer}rem`
   ],

@@ -8,17 +8,17 @@ interface Props {
 export const Home = (props: Props) => {
 
     var Hero = ({children}: FlexProps) => {
+
         var heroClass: FlexProps = {
+            height: ['100vh'],
+            pt:4,
             color: 'primaryContrast',
-            height: ['100vh', '75vh'],
             sx: {
                 background: 'linear-gradient(45deg, #ff416c, #ff4b2b)',
             }
         }
 
         var imageClass: FlexProps = {
-            color: 'primaryContrast',
-            height: ['100vh', '75vh'],
             width: '100%',
             sx: {
                 backgroundImage: 'url(landing01.png)',
