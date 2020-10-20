@@ -3,6 +3,7 @@ import { Box, BoxProps } from "rebass"
 
 var spacer = 1
 var borderWidth = '3px'
+var borderRadius = 4
 
 export var theme = {
   breakpoints: ['30em', '52em', '64em'],
@@ -54,13 +55,29 @@ export var theme = {
       image: {
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
-        objectFit: 'cover'
+        objectFit: 'cover',
+        width: '100%',
+        height: '20rem',
       },
 
       body: {
         p: 3,
       }
     },
+    badge: {
+      p: 1,
+      m: 1,
+      borderStyle: 'solid',
+      borderWidth: borderWidth,
+      borderRadius,
+
+      '&:first-of-type': {
+        ml: 0,
+      },
+      '&:last-of-type': {
+        mr: 0,
+      },
+    }
   },
   text: {
   },
