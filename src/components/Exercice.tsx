@@ -9,8 +9,12 @@ const exerciceTypes = [
     'cardio'
 ] as const
 
-const exerciceTypeColors: Map<typeof exerciceTypes, string> = new Map([
-    ['thighs', 'oui']
+const exerciceTypeColors: Map<typeof exerciceTypes[number], string> = new Map<typeof exerciceTypes[number], string>([
+    ['thighs', 'green'],
+    ['arms', 'orange'],
+    ['back', 'indigo'],
+    ['buttocks', 'blue'],
+    ['cardio', 'red'],
 ])
 
 export type Exercice = {
@@ -23,7 +27,7 @@ export type Exercice = {
 export function ExerciceInList(ex: Exercice): ReactElement {
 
     var tags = ex.tags.map(tag => (
-        <Box as='span' variant='badge'>
+        <Box as='span' variant='badge' color={exerciceTypeColors.get(tag)} sx={{ borderColor: exerciceTypeColors.get(tag)}}>
             {tag.toLocaleUpperCase()}
         </Box>
     ))

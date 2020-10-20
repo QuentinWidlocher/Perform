@@ -15,6 +15,83 @@ export var theme = {
     primaryContrast: 'white',
     primaryLight: '#ff7961',
     primaryDark: '#ba000d',
+
+    red: '#f44336',
+    redLight: '#ff7961',
+    redDark: '#ba000d',
+
+    pink: '#e91e63',
+    pinkLight: '#ff6090',
+    pinkDark: '#b0003a',
+
+    purple: '#9c27b0',
+    purpleLight: '#d05ce3',
+    purpleDark: '#6a0080',
+
+    deepPurple: '#673ab7',
+    deepPurpleLight: '#9a67ea',
+    deepPurpleDark: '#320b86',
+
+    indigo: '#3f51b5',
+    indigoLight: '#757de8',
+    indigoDark: '#002984',
+
+    blue: '#2196f3',
+    blueLight: '#6ec6ff',
+    blueDark: '#0069c0',
+
+    lightBlue: '#03a9f4',
+    lightBlueLight: '#67daff',
+    lightBlueDark: '#007ac1',
+
+    cyan: '#00bcd4',
+    cyanLight: '#62efff',
+    cyanDark: '#008ba3',
+
+    teal: '#009688',
+    tealLight: '#52c7b8',
+    tealDark: '#00675b',
+
+    green: '#4caf50',
+    greenLight: '#80e27e',
+    greenDark: '#087f23',
+
+    lighGreen: '#8bc34a',
+    lighGreenLight: '#bef67a',
+    lighGreenDark: '#5a9216',
+
+    lime: '#cddc39',
+    limeLight: '#ffff6e',
+    limeDark: '#99aa00',
+
+    yellow: '#ffeb3b',
+    yellowLight: '#ffff72',
+    yellowDark: '#c8b900',
+
+    amber: '#ffc107',
+    amberLight: '#fff350',
+    amberDark: '#c79100',
+
+    orange: '#ff9800',
+    orangeLight: '#ffc947',
+    orangeDark: '#c66900',
+
+    deepOrange: '#ff5722',
+    deepOrangeLight: '#ff8a50',
+    deepOrangeDark: '#c41c00',
+
+    brown: '#795548',
+    brownLight: '#a98274',
+    brownDark: '#4b2c20',
+
+    grey: '#9e9e9e',
+    greyLight: '#cfcfcf',
+    greyDark: '#707070',
+
+    blueGrey: '#607d8b',
+    blueGreyLight: '#8eacbb',
+    blueGreyDark: '#34515e',
+
   },
   borderWidth,
   space: [
