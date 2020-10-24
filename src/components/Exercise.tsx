@@ -1,7 +1,8 @@
 import React, { ReactElement } from 'react'
 import { Box, Card, Flex, Heading, Image } from 'rebass'
+import { theme } from '../theme'
 
-const exerciceTypes = [
+const exerciseTypes = [
     'thighs',
     'arms',
     'back',
@@ -9,7 +10,7 @@ const exerciceTypes = [
     'cardio'
 ] as const
 
-const exerciceTypeColors: Map<typeof exerciceTypes[number], string> = new Map<typeof exerciceTypes[number], string>([
+const exerciseTypeColors: Map<typeof exerciseTypes[number], string> = new Map<typeof exerciseTypes[number], string>([
     ['thighs', 'green'],
     ['arms', 'orange'],
     ['back', 'indigo'],
@@ -17,20 +18,31 @@ const exerciceTypeColors: Map<typeof exerciceTypes[number], string> = new Map<ty
     ['cardio', 'red'],
 ])
 
-export type Exercice = {
+export type Exercise = {
     name: string,
     images?: string[],
     duration: number,
-    tags: typeof exerciceTypes[number][]
+    tags: typeof exerciseTypes[number][]
 }
 
-export function ExerciceInList(ex: Exercice): ReactElement {
+export function ExerciseInList(ex: Exercise): ReactElement {
 
-    var tags = ex.tags.map(tag => (
-        <Box as='span' variant='badge' color={exerciceTypeColors.get(tag)} sx={{ borderColor: exerciceTypeColors.get(tag)}}>
-            {tag.toLocaleUpperCase()}
-        </Box>
-    ))
+    var tags = ex.tags.map(tag => {
+
+        var tagColor = exerciseTypeColors.get(tag);
+
+        if (!!tagColor) {
+            var tagColorHex = (theme.colors as any)[tagColor];
+
+            return (
+                <Box as='span' variant='badge' color={tagColor} sx={{ borderColor: tagColor, backgroundColor: `${tagColorHex}20` }}>
+                    {tag.toLocaleUpperCase()}
+                </Box>
+            )
+        } else {
+            return null
+        }
+    })
 
     return (
         <Flex as='li' width={[1, 1 / 2, 1 / 3]} p={3}>

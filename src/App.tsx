@@ -5,7 +5,7 @@ import { Home } from './pages/Home';
 import { Settings } from './pages/Settings';
 import { RiHome2Line, RiSettings3Line } from 'react-icons/ri'
 import { MdFitnessCenter } from 'react-icons/md'
-import { Exercices } from './pages/Exercices';
+import { Exercises } from './pages/Exercises';
 
 export default function App() {
 
@@ -13,7 +13,7 @@ export default function App() {
 
   var links: LinkItem[] = [
     { name: <RiHome2Line />, url: '/', page: Home },
-    { name: <MdFitnessCenter />, url: '/exercices', page: Exercices },
+    { name: <MdFitnessCenter />, url: '/exercises', page: Exercises },
     { name: <RiSettings3Line />, url: '/settings', page: Settings },
   ]
 

@@ -6,7 +6,7 @@ var borderWidth = '3px'
 var borderRadius = 4
 
 export var theme = {
-  breakpoints: ['30em', '52em', '64em'],
+  breakpoints: ['50em', '70em', '80em'],
   fontSizes: [
     12, 14, 16, 20, 24, 32, 48, 64
   ],
@@ -145,8 +145,8 @@ export var theme = {
       p: 1,
       m: 1,
       borderStyle: 'solid',
-      borderWidth: borderWidth,
       borderRadius,
+      fontSize: 0,
 
       '&:first-of-type': {
         ml: 0,
@@ -196,6 +196,6 @@ export var Container = (props: BoxProps) => (
   <Box
     px={[2, 3, 5]}
     mx={[0, 'auto', 'auto']}
-    maxWidth={['100vw', '90vw', '75vw']} {...props}
+    maxWidth={['100vw', '90vw', '80vw']} {...props}
   />
 )
