@@ -5,7 +5,7 @@ interface Props {
 
 }
 
-export const Settings = (props: Props) => {
+export function SettingsPage(props: Props) {
     return (
         <Box>
             <h1>Settings</h1>

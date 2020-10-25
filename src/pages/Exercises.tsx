@@ -1,37 +1,57 @@
-import React from 'react'
-import { Box, Flex, Heading } from 'rebass'
-import { Exercise as Exercise, ExerciseInList } from '../components/Exercise'
+import React, { ReactElement, useState } from 'react'
+import { Exercise, ExerciseCard, ExerciseList, ExerciseListCard } from '../components/Exercise'
 import { TitleBar } from '../components/TitleBar'
-import { Container } from '../theme'
+import { Box, Card, Flex } from 'rebass'
+import { curry, adjust, update, prop, lensProp, set, not, over, omit } from 'ramda'
 
-interface Props {
+export type SelectableExercises = Exercise & { selected: boolean }
 
-}
+interface Props { }
 
-export const Exercises = (props: Props) => {
+export function ExercisesPage(props: any) {
 
-    var exerciseList: Exercise[] = [
-        { name: 'Squats', duration: 60, tags: ['thighs', 'buttocks'], images: ['/assets/exercises/squat.jpg'] },
-        { name: 'Push-ups', duration: 30, tags: ['arms'], images: ['/assets/exercises/push-up.jpg'] },
-        { name: 'Mountain Climbers', duration: 30, tags: ['arms', 'back', "thighs"], images: ['https://www.shape.com.sg/wp-content/uploads/2017/12/mountain_climbers_man.gif'] },
-        { name: 'Lunges', duration: 60, tags: ['thighs', 'buttocks'], images: ['https://i.pinimg.com/originals/9d/71/d5/9d71d53fd3ee16d4c534289259167d1b.jpg'] },
-        { name: 'Jumping Jacks', duration: 45, tags: ['cardio'], images: ['https://1.bp.blogspot.com/-xgT06ZsDsG8/VWpWDrS-wvI/AAAAAAAAGyc/IutIyq1uWRk/s1600/15-Minute%2BWorkouts%2B-%2BQuick%2Band%2BEasy%2BExercise%2BMoves-706069.jpg'] },
-    ]
+    const [exerciseList, setExerciseList] = useState<SelectableExercises[]>([
+        { selected: false, name: 'Squats', duration: 60, tags: ['thighs', 'buttocks'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/squat-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/squat-exercise-illustration.gif'] },
+        { selected: false, name: 'Push-ups', duration: 30, tags: ['arms'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/push-up-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/push-up-exercise-illustration.gif'] },
+        { selected: false, name: 'Mountain Climbers', duration: 30, tags: ['arms', 'back', "thighs"], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/mountain-climbers-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/mountain-climbers-exercise-illustration-spotebi.gif'] },
+        { selected: false, name: 'Lunges', duration: 60, tags: ['thighs', 'buttocks'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/lunges-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/lunges-exercise-illustration.gif'] },
+        { selected: false, name: 'Jumping Jacks', duration: 45, tags: ['cardio'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/jumping-jacks-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/jumping-jacks-exercise-illustration.gif'] },
+    ])
 
-    var exerciseListToDisplay = (
-        <Flex as='ul' flexWrap='wrap'>
-            {exerciseList.map(ex => <ExerciseInList {...ex} />)}
-        </Flex>
-    );
+    var selectedExerciseList = () => exerciseList.filter(ex => ex.selected)
+
+    var ExerciseCardsList = () => {
+
+        function exerciceSelectToggle(index: number) {
+            var itemWithSelectUpdated = over(lensProp('selected'), not, exerciseList[index])
+            var updatedList = update(index, itemWithSelectUpdated, exerciseList)
+            setExerciseList(updatedList)
+        }
+
+        return (
+            <Flex as='ul' flexWrap='wrap'>
+                {exerciseList.map((ex, i) => (
+                    <ExerciseCard
+                        {...ex}
+                        key={`${ex.name}-${i}-card`}
+                        onClick={() => exerciceSelectToggle(i)}
+                    />
+                ))}
+            </Flex>
+        )
+    };
 
     return (
         <>
             <TitleBar>
                 Available Exercises
             </TitleBar>
-            <Container as='main'>
-                {exerciseListToDisplay}
-            </Container>
+            <Box as='main' mb='10rem'>
+                <ExerciseCardsList />
+            </Box>
+            <aside>
+                <ExerciseListCard exs={selectedExerciseList()} />
+            </aside>
         </>
     )
 }

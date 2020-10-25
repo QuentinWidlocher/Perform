@@ -98,7 +98,7 @@ export var theme = {
     0, `${0.25 * spacer}rem`, `${0.5 * spacer}rem`, `${1 * spacer}rem`, `${1.5 * spacer}rem`, `${3 * spacer}rem`
   ],
   fonts: {
-    body: 'system-ui, sans-serif',
+    body: '"Source Sans Pro", system-ui, sans-serif',
     heading: '\'Sora\', sans-serif',
     monospace: 'Menlo, monospace',
   },
@@ -123,11 +123,6 @@ export var theme = {
       bg: 'white',
       borderRadius: 10,
       boxShadow: 'small',
-      cursor: 'pointer',
-
-      '&:hover, &:active': {
-        boxShadow: 'large'
-      },
 
       image: {
         borderTopLeftRadius: 10,
@@ -135,6 +130,17 @@ export var theme = {
         objectFit: 'cover',
         width: '100%',
         height: '20rem',
+      },
+
+      clickable: {
+        bg: 'white',
+        borderRadius: 10,
+        boxShadow: 'small',
+        cursor: 'pointer',
+
+        '&:hover, &:active': {
+          boxShadow: 'large'
+        },
       },
 
       body: {
@@ -168,7 +174,7 @@ export var theme = {
       },
 
       hero: {
-        first: {
+        outline: {
           bg: 'transparent',
           border: `solid ${borderWidth}`,
           borderColor: 'white',
@@ -177,7 +183,7 @@ export var theme = {
             color: 'primary'
           },
         },
-        second: {
+        full: {
           color: 'primary',
           bg: 'white',
           border: `solid ${borderWidth}`,
@@ -188,6 +194,9 @@ export var theme = {
           },
         }
       }
+    },
+    primaryGradient: {
+      background: 'linear-gradient(45deg, #ff416c, #ff4b2b)',
     },
   }
 }

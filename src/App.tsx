@@ -1,26 +1,30 @@
 import React from 'react';
-import { BrowserRouter as Router, useRouteMatch } from 'react-router-dom';
+import { useRouteMatch } from 'react-router-dom';
 import { LinkItem, Navbar, RouterOutlet } from './components/Navigation';
-import { Home } from './pages/Home';
-import { Settings } from './pages/Settings';
+import { HomePage } from './pages/Home';
+import { SettingsPage } from './pages/Settings';
 import { RiHome2Line, RiSettings3Line } from 'react-icons/ri'
 import { MdFitnessCenter } from 'react-icons/md'
-import { Exercises } from './pages/Exercises';
+import { ExercisesPage } from './pages/Exercises';
+import { Box } from 'rebass';
+import { WorkoutPage } from './pages/Workout';
 
 export default function App() {
 
   var onHomePage = !!useRouteMatch({ path: '/', exact: true })
+  var onWorkoutPage = !!useRouteMatch({ path: '/workout', exact: true })
 
   var links: LinkItem[] = [
-    { name: <RiHome2Line />, url: '/', page: Home },
-    { name: <MdFitnessCenter />, url: '/exercises', page: Exercises },
-    { name: <RiSettings3Line />, url: '/settings', page: Settings },
+    { Page: HomePage, name: <RiHome2Line />, url: '/', showInNavbar: true },
+    { Page: ExercisesPage, name: <MdFitnessCenter />, url: '/exercises', showInNavbar: true },
+    { Page: SettingsPage, name: <RiSettings3Line />, url: '/settings', showInNavbar: true },
+    { Page: WorkoutPage, name: 'Workout', url: '/workout', showInNavbar: false },
   ]
 
   return (
-    <div className="app">
-      <Navbar {...{ links }} onHero={onHomePage} />
+    <Box sx={{ fontFamily: 'body' }}>
+      {!onWorkoutPage && <Navbar {...{ links }} onHero={onHomePage} />}
       <RouterOutlet {...{ links }} />
-    </div>
+    </Box>
   );
 }

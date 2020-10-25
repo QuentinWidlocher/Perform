@@ -1,12 +1,14 @@
-import React, { FC } from "react"
+import { propEq } from "ramda";
+import React, { FC, ReactElement } from "react"
 import { NavLink, Route, Switch } from 'react-router-dom';
 import { Box, BoxProps, Flex, FlexProps, Heading, Link as RebassLink, LinkProps as RebassLinkProps } from 'rebass';
 
 export type LinkItem = {
   name: string | JSX.Element,
   url: string,
-  page: FC,
+  Page: (props: any) => JSX.Element,
   props?: any,
+  showInNavbar: boolean,
 }
 
 export type NavbarProps = {
@@ -18,7 +20,7 @@ export function Navbar({ links, onHero }: NavbarProps) {
 
   var navStyle: FlexProps = {
     as: 'nav',
-    width: '100vw',
+    width: '100%',
     justifyContent: 'flex-end',
     alignItems: 'center',
     display: 'flex',
@@ -51,8 +53,10 @@ export function Navbar({ links, onHero }: NavbarProps) {
 
   var CustomLink = (props: RebassLinkProps) => <RebassLink {...{ ...aStyle, ...props }} />
 
-  var routerLinks = links.map(({ name, url }) => (
-    <Box {...liStyle}>
+  var linksToDisplay = links.filter(propEq('showInNavbar', true));
+
+  var routerLinks = linksToDisplay.map(({ name, url }) => (
+    <Box {...liStyle} key={url}>
       <NavLink to={url} component={CustomLink} activeStyle={activeLink} exact={true}>{name}</NavLink>
     </Box>
   ))
@@ -74,8 +78,10 @@ export type RouterOutletProps = {
 }
 
 export function RouterOutlet({ links }: RouterOutletProps) {
-  var routerPages = links.map(({ url, page }) => (
-    <Route path={url} exact key={url}>{page}</Route>
+  var routerPages = links.map(({ url, Page }) => (
+    <Route path={url} exact key={url}>
+      <Page />
+    </Route>
   ))
 
   return (
