@@ -1,10 +1,11 @@
-import { any, equals, not, prop, propEq } from 'ramda'
+import { any, assoc, clone, equals, flatten, flip, intersperse, not, pipe, prop, propEq, repeat, zip, __ } from 'ramda'
 import React, { ReactElement, useCallback, useEffect, useState } from 'react'
 import { IconBaseProps } from 'react-icons/lib'
 import { RiPauseCircleLine, RiPlayLine } from 'react-icons/ri'
+import { Redirect } from 'react-router'
 import { Box, Button, Flex, FlexProps, Heading, Image } from 'rebass'
 import useSound from 'use-sound'
-import { ExerciseList } from '../components/Exercise'
+import { Exercise, ExerciseList } from '../components/Exercise'
 import { workoutState } from '../services/Workout'
 
 const dingSound = require('../assets/sounds/ding.mp3')
@@ -15,13 +16,19 @@ interface Props {
 
 // Status Graph
 // https://mermaid-js.github.io/mermaid-live-editor/#/view/eyJjb2RlIjoiZ3JhcGggTFJcbiAgbm90U3RhcnRlZCAtLS0-fDNzfCBwZW5kaW5nXG4gIHBlbmRpbmcgLS0tPiBvbk5leHRFeGVyY2lzZVxuICBvbk5leHRFeGVyY2lzZSAtLS0-fDIwc3wgaW5Qcm9ncmVzc1xuICBpblByb2dyZXNzIC0tLT4gb25OZXh0RXhlcmNpc2VcbiAgb25OZXh0RXhlcmNpc2UgLS0tPiBlbmRlZFxuICBpblByb2dyZXNzIC0tLT4gcGF1c2VkIC0tLT4gaW5Qcm9ncmVzc1xuXHRcdCIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0IiwidGhlbWVWYXJpYWJsZXMiOnsiYmFja2dyb3VuZCI6IndoaXRlIiwicHJpbWFyeUNvbG9yIjoiI0VDRUNGRiIsInNlY29uZGFyeUNvbG9yIjoiI2ZmZmZkZSIsInRlcnRpYXJ5Q29sb3IiOiJoc2woODAsIDEwMCUsIDk2LjI3NDUwOTgwMzklKSIsInByaW1hcnlCb3JkZXJDb2xvciI6ImhzbCgyNDAsIDYwJSwgODYuMjc0NTA5ODAzOSUpIiwic2Vjb25kYXJ5Qm9yZGVyQ29sb3IiOiJoc2woNjAsIDYwJSwgODMuNTI5NDExNzY0NyUpIiwidGVydGlhcnlCb3JkZXJDb2xvciI6ImhzbCg4MCwgNjAlLCA4Ni4yNzQ1MDk4MDM5JSkiLCJwcmltYXJ5VGV4dENvbG9yIjoiIzEzMTMwMCIsInNlY29uZGFyeVRleHRDb2xvciI6IiMwMDAwMjEiLCJ0ZXJ0aWFyeVRleHRDb2xvciI6InJnYig5LjUwMDAwMDAwMDEsIDkuNTAwMDAwMDAwMSwgOS41MDAwMDAwMDAxKSIsImxpbmVDb2xvciI6IiMzMzMzMzMiLCJ0ZXh0Q29sb3IiOiIjMzMzIiwibWFpbkJrZyI6IiNFQ0VDRkYiLCJzZWNvbmRCa2ciOiIjZmZmZmRlIiwiYm9yZGVyMSI6IiM5MzcwREIiLCJib3JkZXIyIjoiI2FhYWEzMyIsImFycm93aGVhZENvbG9yIjoiIzMzMzMzMyIsImZvbnRGYW1pbHkiOiJcInRyZWJ1Y2hldCBtc1wiLCB2ZXJkYW5hLCBhcmlhbCIsImZvbnRTaXplIjoiMTZweCIsImxhYmVsQmFja2dyb3VuZCI6IiNlOGU4ZTgiLCJub2RlQmtnIjoiI0VDRUNGRiIsIm5vZGVCb3JkZXIiOiIjOTM3MERCIiwiY2x1c3RlckJrZyI6IiNmZmZmZGUiLCJjbHVzdGVyQm9yZGVyIjoiI2FhYWEzMyIsImRlZmF1bHRMaW5rQ29sb3IiOiIjMzMzMzMzIiwidGl0bGVDb2xvciI6IiMzMzMiLCJlZGdlTGFiZWxCYWNrZ3JvdW5kIjoiI2U4ZThlOCIsImFjdG9yQm9yZGVyIjoiaHNsKDI1OS42MjYxNjgyMjQzLCA1OS43NzY1MzYzMTI4JSwgODcuOTAxOTYwNzg0MyUpIiwiYWN0b3JCa2ciOiIjRUNFQ0ZGIiwiYWN0b3JUZXh0Q29sb3IiOiJibGFjayIsImFjdG9yTGluZUNvbG9yIjoiZ3JleSIsInNpZ25hbENvbG9yIjoiIzMzMyIsInNpZ25hbFRleHRDb2xvciI6IiMzMzMiLCJsYWJlbEJveEJrZ0NvbG9yIjoiI0VDRUNGRiIsImxhYmVsQm94Qm9yZGVyQ29sb3IiOiJoc2woMjU5LjYyNjE2ODIyNDMsIDU5Ljc3NjUzNjMxMjglLCA4Ny45MDE5NjA3ODQzJSkiLCJsYWJlbFRleHRDb2xvciI6ImJsYWNrIiwibG9vcFRleHRDb2xvciI6ImJsYWNrIiwibm90ZUJvcmRlckNvbG9yIjoiI2FhYWEzMyIsIm5vdGVCa2dDb2xvciI6IiNmZmY1YWQiLCJub3RlVGV4dENvbG9yIjoiYmxhY2siLCJhY3RpdmF0aW9uQm9yZGVyQ29sb3IiOiIjNjY2IiwiYWN0aXZhdGlvbkJrZ0NvbG9yIjoiI2Y0ZjRmNCIsInNlcXVlbmNlTnVtYmVyQ29sb3IiOiJ3aGl0ZSIsInNlY3Rpb25Ca2dDb2xvciI6InJnYmEoMTAyLCAxMDIsIDI1NSwgMC40OSkiLCJhbHRTZWN0aW9uQmtnQ29sb3IiOiJ3aGl0ZSIsInNlY3Rpb25Ca2dDb2xvcjIiOiIjZmZmNDAwIiwidGFza0JvcmRlckNvbG9yIjoiIzUzNGZiYyIsInRhc2tCa2dDb2xvciI6IiM4YTkwZGQiLCJ0YXNrVGV4dExpZ2h0Q29sb3IiOiJ3aGl0ZSIsInRhc2tUZXh0Q29sb3IiOiJ3aGl0ZSIsInRhc2tUZXh0RGFya0NvbG9yIjoiYmxhY2siLCJ0YXNrVGV4dE91dHNpZGVDb2xvciI6ImJsYWNrIiwidGFza1RleHRDbGlja2FibGVDb2xvciI6IiMwMDMxNjMiLCJhY3RpdmVUYXNrQm9yZGVyQ29sb3IiOiIjNTM0ZmJjIiwiYWN0aXZlVGFza0JrZ0NvbG9yIjoiI2JmYzdmZiIsImdyaWRDb2xvciI6ImxpZ2h0Z3JleSIsImRvbmVUYXNrQmtnQ29sb3IiOiJsaWdodGdyZXkiLCJkb25lVGFza0JvcmRlckNvbG9yIjoiZ3JleSIsImNyaXRCb3JkZXJDb2xvciI6IiNmZjg4ODgiLCJjcml0QmtnQ29sb3IiOiJyZWQiLCJ0b2RheUxpbmVDb2xvciI6InJlZCIsImxhYmVsQ29sb3IiOiJibGFjayIsImVycm9yQmtnQ29sb3IiOiIjNTUyMjIyIiwiZXJyb3JUZXh0Q29sb3IiOiIjNTUyMjIyIiwiY2xhc3NUZXh0IjoiIzEzMTMwMCIsImZpbGxUeXBlMCI6IiNFQ0VDRkYiLCJmaWxsVHlwZTEiOiIjZmZmZmRlIiwiZmlsbFR5cGUyIjoiaHNsKDMwNCwgMTAwJSwgOTYuMjc0NTA5ODAzOSUpIiwiZmlsbFR5cGUzIjoiaHNsKDEyNCwgMTAwJSwgOTMuNTI5NDExNzY0NyUpIiwiZmlsbFR5cGU0IjoiaHNsKDE3NiwgMTAwJSwgOTYuMjc0NTA5ODAzOSUpIiwiZmlsbFR5cGU1IjoiaHNsKC00LCAxMDAlLCA5My41Mjk0MTE3NjQ3JSkiLCJmaWxsVHlwZTYiOiJoc2woOCwgMTAwJSwgOTYuMjc0NTA5ODAzOSUpIiwiZmlsbFR5cGU3IjoiaHNsKDE4OCwgMTAwJSwgOTMuNTI5NDExNzY0NyUpIn19LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ
-type Status = 'notStarted' | 'pending' | 'onNextExercise' | 'paused' | 'inProgress' | 'ended'
+type Status = 'notStarted' | 'waitingToStart' | 'breakBeforeNext' | 'paused' | 'inProgress' | 'ended'
+
+type WorkoutState = {
+    status: Status,
+    duration?: number,
+    exercise?: Exercise,
+}
 
 const nextSteps: { current: Status, next: Status }[] = [
-    { current: 'notStarted', next: 'pending' },
-    { current: 'pending', next: 'inProgress' },
-    { current: 'onNextExercise', next: 'inProgress' },
-    { current: 'inProgress', next: 'onNextExercise' },
+    { current: 'notStarted', next: 'waitingToStart' },
+    { current: 'waitingToStart', next: 'inProgress' },
+    { current: 'breakBeforeNext', next: 'inProgress' },
+    { current: 'inProgress', next: 'breakBeforeNext' },
     { current: 'paused', next: 'inProgress' },
 ]
 
@@ -30,20 +37,35 @@ export function WorkoutPage(props: Props): ReactElement {
     const secondsBeforeStarting = 5
     const secondsToRest = 3
 
-    var workout = [...workoutState.workout]
+    var workout: WorkoutState[] = (() => {
+        var exerciseList = clone(workoutState.workout)
+        var addExercice = assoc<keyof WorkoutState>('exercise')
+        var addDuration = assoc<keyof WorkoutState>('duration')
 
-    // FIXME : VIREZ MOI
-    // workout = [
-    //     { name: 'Squats', duration: 2, tags: ['thighs', 'buttocks'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/squat-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/squat-exercise-illustration.gif'] },
-    //     { name: 'Push-ups', duration: 3, tags: ['arms'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/push-up-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/push-up-exercise-illustration.gif'] },
-    //     { name: 'Mountain Climbers', duration: 4, tags: ['arms', 'back', "thighs"], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/mountain-climbers-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/mountain-climbers-exercise-illustration-spotebi.gif'] },
-    //     { name: 'Lunges', duration: 5, tags: ['thighs', 'buttocks'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/lunges-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/lunges-exercise-illustration.gif'] },
-    //     { name: 'Jumping Jacks', duration: 6, tags: ['cardio'], images: ['https://www.spotebi.com/wp-content/uploads/2014/10/jumping-jacks-exercise-illustration.jpg', 'https://www.spotebi.com/wp-content/uploads/2014/10/jumping-jacks-exercise-illustration.gif'] },
-    // ]
+        var addStatus = assoc<keyof WorkoutState>('status')
+        var addInProgress = addStatus<Status>('inProgress')
+
+        var createWorkoutStateWithStatus = flip(addStatus)({})
+        var createWorkoutStateWithExercise = flip(addExercice)({})
+
+        var createWorkoutStateFromExercise = (e: Exercise): WorkoutState => addDuration(e.duration, addInProgress(createWorkoutStateWithExercise(e)))
+
+        var workout: WorkoutState[] = exerciseList.map(createWorkoutStateFromExercise)
+
+        var breakState: WorkoutState = addDuration(secondsToRest, createWorkoutStateWithStatus('breakBeforeNext'))
+
+        var workoutWithBreaks: WorkoutState[] = intersperse(breakState, workout)
+
+        var notStartedState: WorkoutState = createWorkoutStateWithStatus('notStarted')
+        var waitingToStartState: WorkoutState = addDuration(secondsBeforeStarting, createWorkoutStateWithStatus('waitingToStart'))
+        var endedState: WorkoutState = createWorkoutStateWithStatus('ended')
+
+        return [notStartedState, waitingToStartState, ...workoutWithBreaks, endedState]
+    })()
 
     //#region States
 
-    const [workoutIndex, setWorkoutIndex] = useState(0)
+    const [workoutIndex, setWorkoutIndex] = useState(-1)
 
     const [status, setStatus] = useState<Status>('notStarted')
 
@@ -98,16 +120,17 @@ export function WorkoutPage(props: Props): ReactElement {
     // update on status
     useEffect(() => {
         if (not(statusWas(status))) {
+            console.debug('status is now', status)
             switch (status) {
-                case 'pending':
+                case 'waitingToStart':
                     if (not(statusWas('paused'))) {
                         setTimer(secondsBeforeStarting)
                     }
-                    setPreviousStatus('pending')
+                    setPreviousStatus('waitingToStart')
                     break;
 
-                case 'onNextExercise':
-                    setPreviousStatus('onNextExercise')
+                case 'breakBeforeNext':
+                    setPreviousStatus('breakBeforeNext')
                     if (workoutIndex + 1 < workout.length) {
                         playDoubleDingSound()
                         setTimer(secondsToRest)
@@ -119,7 +142,7 @@ export function WorkoutPage(props: Props): ReactElement {
                 case 'inProgress':
                     if (not(statusWas('paused'))) {
                         setWorkoutIndex(workoutIndex + 1)
-                        setTimer(getCurrentExerciseDuration())
+                        setTimer(0)
                         playDingSound()
                     }
                     setPreviousStatus('inProgress')
@@ -142,7 +165,7 @@ export function WorkoutPage(props: Props): ReactElement {
 
     // update on timer
     useEffect(() => {
-        if (statusIsOneOf(['inProgress', 'onNextExercise', 'pending'])) {
+        if (statusIsOneOf(['inProgress', 'breakBeforeNext', 'waitingToStart'])) {
 
             if (timer >= 0) {
                 var t = setTimeout(() => {
@@ -162,7 +185,7 @@ export function WorkoutPage(props: Props): ReactElement {
     //#region Components
 
     var LaunchButton = () => (statusIs('notStarted')) ? (
-        <Button m="auto" p={3} variant='primary.hero.full' onClick={() => setStatus('pending')}>
+        <Button m="auto" p={3} variant='primary.hero.full' onClick={() => setStatus('waitingToStart')}>
             Start the workout !
         </Button>
     ) : null
@@ -175,16 +198,16 @@ export function WorkoutPage(props: Props): ReactElement {
         var statusToCheck = statusIs('paused') ? statusBeforePause : status
 
         switch (statusToCheck) {
-            case 'pending':
-                text = `Get ready for ${nextExercise?.name} !`
+            case 'waitingToStart':
+                text = `Get ready for ${nextExercise?.exercise?.name} !`
                 break
 
             case 'inProgress':
-                text = `${currentExercise.name} for ${currentExercise.duration}s`
+                text = `${currentExercise?.exercise?.name} for ${currentExercise?.duration}s`
                 break
 
-            case 'onNextExercise':
-                text = `Great ! Break for ${secondsToRest}s before the ${nextExercise?.name}`
+            case 'breakBeforeNext':
+                text = `Great ! Break for ${secondsToRest}s before the ${nextExercise?.exercise?.name}`
                 break
         }
 
@@ -202,13 +225,13 @@ export function WorkoutPage(props: Props): ReactElement {
 
         if (checkForStatus(['inProgress'])) {
             exerciceToDisplay = getCurrentExercise()
-        } else if (checkForStatus(['onNextExercise', 'pending'])) {
+        } else if (checkForStatus(['breakBeforeNext', 'waitingToStart'])) {
             exerciceToDisplay = workout[workoutIndex + 1]
         }
 
-        if (exerciceToDisplay && exerciceToDisplay.images && exerciceToDisplay.images.length > 1) {
-            var imageIndexToDisplay = statusIs('onNextExercise') ? 0 : 1
-            return <Image src={exerciceToDisplay.images[imageIndexToDisplay]} alt={exerciceToDisplay.name} sx={{ objectFit: 'contain' }} />
+        if (exerciceToDisplay && exerciceToDisplay?.exercise?.images && exerciceToDisplay?.exercise?.images.length > 1) {
+            var imageIndexToDisplay = statusIs('breakBeforeNext') ? 0 : 1
+            return <Image src={exerciceToDisplay?.exercise?.images[imageIndexToDisplay]} alt={exerciceToDisplay.exercise?.name} sx={{ objectFit: 'contain' }} />
         } else {
             return null
         }
@@ -235,7 +258,7 @@ export function WorkoutPage(props: Props): ReactElement {
             }
         }
 
-        return statusIsOneOf(['paused', 'inProgress', 'onNextExercise', 'pending']) ? (
+        return statusIsOneOf(['paused', 'inProgress', 'breakBeforeNext', 'waitingToStart']) ? (
             <Button
                 onClick={playOrPause}
                 mx='auto'
@@ -253,11 +276,9 @@ export function WorkoutPage(props: Props): ReactElement {
         ) : null
     }
 
-    var ProgressBar = () => {
-        return (
-            <Box width={`${(workoutIndex / (workout.length - 1)) * 100}%`} height={5} backgroundColor='white' />
-        )
-    }
+    var ProgressBar = () => (
+        <Box width={`${(workoutIndex / workout.length) * 100}%`} height={5} backgroundColor='white' />
+    )
 
     //#endregion
 
@@ -277,7 +298,7 @@ export function WorkoutPage(props: Props): ReactElement {
     //#endregion
 
     //#region Page
-    return (
+    var page = !!workout && workout.length > 0 ? (
         <Flex {...fullscreenClass} flexDirection={['column', 'row']}>
             <Flex {...splitScreenClass} sx={{ flexBasis: '100%' }} backgroundColor="white" color="black">
                 {
@@ -285,7 +306,7 @@ export function WorkoutPage(props: Props): ReactElement {
                         ? (
                             <Box m='auto'>
                                 <Heading color='primary' fontSize='3rem'>Perform.</Heading>
-                                <ExerciseList exs={workout} />
+                                <ExerciseList exs={clone(workoutState.workout)} />
                             </Box>
                         )
                         : <ExerciceImage />}
@@ -304,6 +325,8 @@ export function WorkoutPage(props: Props): ReactElement {
 
             </Flex>
         </Flex>
-    )
+    ) : <Redirect to='/exercises' />
+
+    return page
     //#endregion
 }
