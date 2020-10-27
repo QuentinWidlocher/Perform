@@ -1,14 +1,18 @@
-import { any, assoc, clone, equals, flatten, flip, intersperse, not, pipe, prop, propEq, repeat, zip, __ } from 'ramda'
-import React, { ReactElement, useCallback, useEffect, useState } from 'react'
+import { time } from 'console'
+import { any, assoc, clone, equals, flatten, flip, inc, intersperse, isEmpty, isNil, not, pipe, prop, propEq, repeat, sum, zip, __ } from 'ramda'
+import React, { CSSProperties, ReactElement, useCallback, useEffect, useState } from 'react'
 import { IconBaseProps } from 'react-icons/lib'
 import { RiPauseCircleLine, RiPlayLine } from 'react-icons/ri'
 import { Redirect } from 'react-router'
+import { Link } from 'react-router-dom'
 import { Box, Button, Flex, FlexProps, Heading, Image } from 'rebass'
+import { interval, Subject } from 'rxjs'
 import useSound from 'use-sound'
 import { Exercise, ExerciseList } from '../components/Exercise'
 import { workoutState } from '../services/Workout'
 
 const dingSound = require('../assets/sounds/ding.mp3')
+const cheeringSound = require('../assets/sounds/cheering.mp3')
 
 interface Props {
 
@@ -37,210 +41,211 @@ export function WorkoutPage(props: Props): ReactElement {
     const secondsBeforeStarting = 5
     const secondsToRest = 3
 
-    var workout: WorkoutState[] = (() => {
-        var exerciseList = clone(workoutState.workout)
-        var addExercice = assoc<keyof WorkoutState>('exercise')
-        var addDuration = assoc<keyof WorkoutState>('duration')
+    const workout: WorkoutState[] = (() => {
 
-        var addStatus = assoc<keyof WorkoutState>('status')
-        var addInProgress = addStatus<Status>('inProgress')
+        var createWorkoutStateFromExercise = (e: Exercise): WorkoutState => ({ status: 'inProgress', duration: e.duration, exercise: e })
 
-        var createWorkoutStateWithStatus = flip(addStatus)({})
-        var createWorkoutStateWithExercise = flip(addExercice)({})
+        var breakState: WorkoutState = { status: 'breakBeforeNext', duration: secondsToRest }
+        var notStartedState: WorkoutState = { status: 'notStarted' }
+        var waitingToStartState: WorkoutState = { status: 'waitingToStart', duration: secondsBeforeStarting }
+        var endedState: WorkoutState = { status: 'ended' }
 
-        var createWorkoutStateFromExercise = (e: Exercise): WorkoutState => addDuration(e.duration, addInProgress(createWorkoutStateWithExercise(e)))
-
-        var workout: WorkoutState[] = exerciseList.map(createWorkoutStateFromExercise)
-
-        var breakState: WorkoutState = addDuration(secondsToRest, createWorkoutStateWithStatus('breakBeforeNext'))
-
+        var workout: WorkoutState[] = clone(workoutState.workout).map(createWorkoutStateFromExercise)
         var workoutWithBreaks: WorkoutState[] = intersperse(breakState, workout)
-
-        var notStartedState: WorkoutState = createWorkoutStateWithStatus('notStarted')
-        var waitingToStartState: WorkoutState = addDuration(secondsBeforeStarting, createWorkoutStateWithStatus('waitingToStart'))
-        var endedState: WorkoutState = createWorkoutStateWithStatus('ended')
 
         return [notStartedState, waitingToStartState, ...workoutWithBreaks, endedState]
     })()
 
+    const totalProgression: number = sum(workout.map(w => isNil(w.duration) ? 0 : w.duration))
+
     //#region States
 
-    const [workoutIndex, setWorkoutIndex] = useState(-1)
+    var [workoutIndex, setWorkoutIndex] = useState(0)
 
-    const [status, setStatus] = useState<Status>('notStarted')
+    var [countdown, setCountDown] = useState(0)
 
-    const [timer, setTimer] = useState(0)
+    var [isPaused, setIsPaused] = useState(false)
 
-    const [statusBeforePause, setStatusBeforePause] = useState<Status>('notStarted')
+    var [timer, setTimer] = useState<number>()
 
-    const [timerBeforePause, setTimerBeforePause] = useState(0)
+    var [progression, setProgression] = useState(0)
 
-    const [previousStatus, setPreviousStatus] = useState<Status | null>(null)
+    var [playDingSound] = useSound(dingSound)
 
-    const [playDingSound] = useSound(dingSound)
+    var [playCheeringSound] = useSound(cheeringSound)
 
     //#endregion
 
     //#region Utils (pure)
 
-    var statusIs = equals(status)
+    var getDuration = (w: WorkoutState) => prop('duration', w)
+    var getStatus = (w: WorkoutState) => prop('status', w)
+    var getExercise = (w: WorkoutState) => prop('exercise', w)
+
+    var getCurrentStep = (): WorkoutState => workout[workoutIndex]
+    var getCurrentDuration = () => getDuration(getCurrentStep())
+    var getCurrentExercise = () => getExercise(getCurrentStep())
+    var getCurrentStatus = () => getStatus(getCurrentStep())
+    var statusIs = equals(getCurrentStatus())
     var statusIsOneOf = any(statusIs)
-    var statusWas = equals(previousStatus)
+    var statusHasCountdown = () => statusIsOneOf(['waitingToStart', 'inProgress', 'breakBeforeNext'])
+
+    var getNextStep = (): WorkoutState => workout[workoutIndex + 1]
+    var getNextDuration = () => getDuration(getNextStep())
+    var getNextExercise = () => getExercise(getNextStep())
+    var getNextStatus = () => getStatus(getNextStep())
+    var statusWas = equals(getNextStatus())
     var statusWasOneOf = any(statusWas)
-    var statusWasBeforePause = equals(statusBeforePause)
-    var statusWasOneOfBeforePause = any(statusWasBeforePause)
 
-    var getNextStep = (currentStep: Status) => nextSteps.find(propEq('current', currentStep))?.next || 'ended'
+    var assertExist = (o: any, err: string) => { if (isNil(o)) throw err }
 
-    var getCurrentExercise = useCallback(() => workout[workoutIndex] || null, [workout, workoutIndex])
-    var getCurrentExerciseDuration = useCallback(() => prop('duration', getCurrentExercise()), [getCurrentExercise])
-
-    var playDoubleDingSound = useCallback(() => {
+    var playMultipleDingSound = (timesToPlay = 1) => {
         var i = 0
         var t = setInterval(() => {
-            if (i < 2) {
+            if (i < timesToPlay) {
                 playDingSound()
                 i++
             } else {
                 clearInterval(t)
             }
-        }, 100)
-    }, [playDingSound])
+        }, 500)
+    }
 
     //#endregion
 
     //#region Utils (impure)
 
-    var goToNextStep = useCallback(() => setStatus(getNextStep(status)), [status])
+    var goToNextStep = () => {
+        setWorkoutIndex(workoutIndex + 1)
+    }
+
+    var decrementCountdown = () => {
+        setCountDown(countdown - 1)
+        // Broken because of race conditions ?
+        // setProgression(progression + 1)
+    }
 
     //#endregion
 
     //#region Hooks
 
-    // update on status
+    // Update when step change
     useEffect(() => {
-        if (not(statusWas(status))) {
-            console.debug('status is now', status)
-            switch (status) {
-                case 'waitingToStart':
-                    if (not(statusWas('paused'))) {
-                        setTimer(secondsBeforeStarting)
-                    }
-                    setPreviousStatus('waitingToStart')
-                    break;
+        var currentWorkoutState = workout[workoutIndex]
 
-                case 'breakBeforeNext':
-                    setPreviousStatus('breakBeforeNext')
-                    if (workoutIndex + 1 < workout.length) {
-                        playDoubleDingSound()
-                        setTimer(secondsToRest)
-                    } else {
-                        setStatus('ended')
-                    }
-                    break
-
-                case 'inProgress':
-                    if (not(statusWas('paused'))) {
-                        setWorkoutIndex(workoutIndex + 1)
-                        setTimer(0)
-                        playDingSound()
-                    }
-                    setPreviousStatus('inProgress')
-                    break
-
-                case 'paused':
-                    setPreviousStatus('paused')
-                    break
-
-                case 'ended':
-                    setPreviousStatus('ended')
-                    break
-
-                default:
-                    break;
-            }
+        if (statusHasCountdown()) {
+            var timeToSet = currentWorkoutState.duration || 0
+            setCountDown(timeToSet)
         }
 
-    }, [status, workoutIndex, workout.length, getCurrentExercise, previousStatus, getCurrentExerciseDuration, statusWas, playDingSound, playDoubleDingSound])
-
-    // update on timer
-    useEffect(() => {
-        if (statusIsOneOf(['inProgress', 'breakBeforeNext', 'waitingToStart'])) {
-
-            if (timer >= 0) {
-                var t = setTimeout(() => {
-                    setTimer(timer - 1)
-                }, 1000);
-            } else {
-                setTimer(0)
-                goToNextStep()
-            }
+        if (statusIs('inProgress')) {
+            playDingSound()
+        } else if (statusIs('breakBeforeNext')) {
+            playMultipleDingSound(2)
+        } else if (statusIs('ended')) {
+            playCheeringSound()
         }
 
-        return () => clearTimeout(t)
-    }, [goToNextStep, status, statusIsOneOf, timer])
+    }, [workoutIndex])
+
+    // Update when countdown change
+    useEffect(function tickOneSecondIfNeeded() {
+
+        var mustTickOneSecond = statusHasCountdown() && countdown >= 0 && not(isPaused)
+
+        if (mustTickOneSecond) {
+            var timer = setTimeout(() => {
+                decrementCountdown()
+                if (countdown <= 0) {
+                    goToNextStep()
+                }
+            }, 1000)
+
+            setTimer(timer)
+        }
+
+    }, [countdown, isPaused])
 
     //#endregion
 
     //#region Components
 
-    var LaunchButton = () => (statusIs('notStarted')) ? (
-        <Button m="auto" p={3} variant='primary.hero.full' onClick={() => setStatus('waitingToStart')}>
-            Start the workout !
-        </Button>
-    ) : null
-
     var Timer = () => {
         var text = null
         var currentExercise = getCurrentExercise()
-        var nextExercise = workout[workoutIndex + 1]
+        var nextExercise = getNextExercise()
 
-        var statusToCheck = statusIs('paused') ? statusBeforePause : status
+        var assertNextExercise = () => assertExist(nextExercise, 'Unable to display Timer, no next exercise found')
+        var assertCurrentExercise = () => assertExist(currentExercise, 'Unable to display Timer, no current exercise found')
 
-        switch (statusToCheck) {
+        switch (getCurrentStatus()) {
             case 'waitingToStart':
-                text = `Get ready for ${nextExercise?.exercise?.name} !`
+                assertNextExercise()
+                text = `Get ready for ${nextExercise!.name} !`
                 break
 
             case 'inProgress':
-                text = `${currentExercise?.exercise?.name} for ${currentExercise?.duration}s`
+                assertCurrentExercise()
+                text = `${currentExercise!.name} for ${currentExercise!.duration}s`
                 break
 
             case 'breakBeforeNext':
-                text = `Great ! Break for ${secondsToRest}s before the ${nextExercise?.exercise?.name}`
+                assertNextExercise()
+                text = `Great ! Break for ${secondsToRest}s before the ${nextExercise!.name}`
                 break
         }
 
         return !!text ? (
-            <Box m='auto' opacity={statusIs('paused') ? 0.5 : 1}>
+            <Box m='auto' opacity={isPaused ? 0.5 : 1}>
                 <Heading textAlign='center' mb={3}>{text}</Heading>
-                <Heading fontSize={7} textAlign='center'>{timer}</Heading>
+                <Heading fontSize={7} textAlign='center'>{countdown}</Heading>
             </Box>
         ) : null
     }
 
     var ExerciceImage = () => {
         var exerciceToDisplay = null
-        var checkForStatus = statusIs('paused') ? statusWasOneOfBeforePause : statusIsOneOf
 
-        if (checkForStatus(['inProgress'])) {
-            exerciceToDisplay = getCurrentExercise()
-        } else if (checkForStatus(['breakBeforeNext', 'waitingToStart'])) {
-            exerciceToDisplay = workout[workoutIndex + 1]
+        var stackedInGrid = {
+            gridRow: 1,
+            gridColumn: 1,
         }
 
-        if (exerciceToDisplay && exerciceToDisplay?.exercise?.images && exerciceToDisplay?.exercise?.images.length > 1) {
-            var imageIndexToDisplay = statusIs('breakBeforeNext') ? 0 : 1
-            return <Image src={exerciceToDisplay?.exercise?.images[imageIndexToDisplay]} alt={exerciceToDisplay.exercise?.name} sx={{ objectFit: 'contain' }} />
-        } else {
+        var fullSizeImageStyles = {
+            ...stackedInGrid,
+            zIndex: 1,
+            width: '100%',
+            height: '100%',
+        }
+
+        if (statusIsOneOf(['inProgress'])) {
+            exerciceToDisplay = getCurrentExercise()
+            assertExist(exerciceToDisplay, 'Unable to display ExerciceImage, no current exercise found')
+        } else if (statusIsOneOf(['breakBeforeNext', 'waitingToStart'])) {
+            exerciceToDisplay = getNextExercise()
+            assertExist(exerciceToDisplay, 'Unable to display ExerciceImage, no next exercise found')
+        } else if (statusIs('ended')) {
+            return (
+                <React.Fragment>
+                    <Image src='/assets/confettis.webp' alt='confettis' sx={{ ...fullSizeImageStyles, objectFit: 'cover' }} />
+                    <Heading color='primary' fontSize='3rem' m='auto' sx={stackedInGrid}>YOU DID IT !</Heading>
+                </React.Fragment>
+            )
+        }
+
+        var images = exerciceToDisplay!.images
+        if (isNil(images) || isEmpty(images)) {
             return null
+        } else {
+            var imageIndexToDisplay = statusIsOneOf(['breakBeforeNext', 'waitingToStart']) ? 0 : 1
+            return <Image src={images[imageIndexToDisplay]} alt={exerciceToDisplay!.name} sx={{ ...fullSizeImageStyles, objectFit: 'contain' }} />
         }
     }
 
     var PlayStopButton = () => {
 
         var Icon = (props: IconBaseProps) => {
-            if (statusIs('paused')) {
+            if (isPaused) {
                 return <RiPlayLine {...props} />
             } else {
                 return <RiPauseCircleLine {...props} />
@@ -248,17 +253,18 @@ export function WorkoutPage(props: Props): ReactElement {
         }
 
         var playOrPause = () => {
-            if (statusIs('paused')) {
-                setStatus(statusBeforePause)
-                setTimer(timerBeforePause)
+            var newPause = not(isPaused)
+
+            setIsPaused(newPause)
+
+            if (newPause) {
+                clearTimeout(timer)
             } else {
-                setStatusBeforePause(status)
-                setTimerBeforePause(timer)
-                setStatus('paused')
+                setCountDown(countdown)
             }
         }
 
-        return statusIsOneOf(['paused', 'inProgress', 'breakBeforeNext', 'waitingToStart']) ? (
+        return statusIsOneOf(['inProgress', 'breakBeforeNext', 'waitingToStart']) ? (
             <Button
                 onClick={playOrPause}
                 mx='auto'
@@ -277,8 +283,51 @@ export function WorkoutPage(props: Props): ReactElement {
     }
 
     var ProgressBar = () => (
-        <Box width={`${(workoutIndex / workout.length) * 100}%`} height={5} backgroundColor='white' />
+        <Box width={`${(progression / totalProgression) * 100}%`} height={5} backgroundColor='white' />
     )
+
+    var LaunchButton = () => (
+        <Button m="auto" p={3} variant='primary.hero.full' onClick={goToNextStep}>
+            Start the workout !
+        </Button>
+    )
+
+    var ReturnButton = () => (
+        <Box m='auto'>
+            <Link to='/'>
+                <Button p={3} variant='primary.hero.full'>
+                    Go back and rest
+            </Button>
+            </Link>
+        </Box>
+    )
+
+    var RedScreen = () => {
+        if (statusIs('notStarted')) {
+            return <LaunchButton />
+        } else if (statusIs('ended')) {
+            return <ReturnButton />
+        } else {
+            return (
+                <Flex width='100%' flexDirection='column'>
+                    <ProgressBar />
+                    <Timer />
+                    <PlayStopButton />
+                </Flex>)
+        }
+    }
+
+    var WhiteScreen = () => {
+        if (statusIs('notStarted')) {
+            return (
+                <Box m='auto'>
+                    <Heading color='primary' fontSize='3rem'>Perform.</Heading>
+                    <ExerciseList exs={workout.filter(propEq('status', 'inProgress')).map(prop('exercise') as any)} />
+                </Box>)
+        } else {
+            return <ExerciceImage />
+        }
+    }
 
     //#endregion
 
@@ -295,34 +344,22 @@ export function WorkoutPage(props: Props): ReactElement {
         height: '100%',
     }
 
+    var stackableGridStyles: CSSProperties = {
+        display: 'grid',
+        gridTemplateRows: '1fr',
+        gridTemplateColumns: '1fr',
+    }
+
     //#endregion
 
     //#region Page
-    var page = !!workout && workout.length > 0 ? (
+    var page = !!workoutState.workout && workoutState.workout.length > 0 ? (
         <Flex {...fullscreenClass} flexDirection={['column', 'row']}>
-            <Flex {...splitScreenClass} sx={{ flexBasis: '100%' }} backgroundColor="white" color="black">
-                {
-                    statusIs('notStarted')
-                        ? (
-                            <Box m='auto'>
-                                <Heading color='primary' fontSize='3rem'>Perform.</Heading>
-                                <ExerciseList exs={clone(workoutState.workout)} />
-                            </Box>
-                        )
-                        : <ExerciceImage />}
-            </Flex>
+            <Box {...splitScreenClass} sx={{ flexBasis: '100%', ...stackableGridStyles }} backgroundColor="white" color="black">
+                <WhiteScreen />
+            </Box>
             <Flex {...splitScreenClass} p={2}>
-
-                {
-                    statusIs('notStarted')
-                        ? <LaunchButton />
-                        : <Flex width='100%' flexDirection='column'>
-                            <ProgressBar />
-                            <Timer />
-                            <PlayStopButton />
-                        </Flex>
-                }
-
+                <RedScreen />
             </Flex>
         </Flex>
     ) : <Redirect to='/exercises' />
