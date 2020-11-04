@@ -12,7 +12,8 @@ const exerciseTypes = [
     'arms',
     'back',
     'buttocks',
-    'cardio'
+    'cardio',
+    'abs'
 ] as const
 
 type ExerciseType = typeof exerciseTypes[number]
