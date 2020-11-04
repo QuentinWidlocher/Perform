@@ -1,12 +1,10 @@
-import { time } from 'console'
-import { any, assoc, clone, equals, flatten, flip, inc, intersperse, isEmpty, isNil, not, pipe, prop, propEq, repeat, sum, zip, __ } from 'ramda'
-import React, { CSSProperties, ReactElement, useCallback, useEffect, useState } from 'react'
+import { any, clone, equals, intersperse, isEmpty, isNil, not, prop, propEq, sum } from 'ramda'
+import React, { CSSProperties, ReactElement, useEffect, useState } from 'react'
 import { IconBaseProps } from 'react-icons/lib'
 import { RiPauseCircleLine, RiPlayLine } from 'react-icons/ri'
 import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, FlexProps, Heading, Image } from 'rebass'
-import { interval, Subject } from 'rxjs'
 import useSound from 'use-sound'
 import { Exercise, ExerciseList } from '../components/Exercise'
 import { workoutState } from '../services/Workout'
@@ -39,7 +37,7 @@ const nextSteps: { current: Status, next: Status }[] = [
 export function WorkoutPage(props: Props): ReactElement {
 
     const secondsBeforeStarting = 5
-    const secondsToRest = 3
+    const secondsToRest = 30
 
     const workout: WorkoutState[] = (() => {
 
@@ -50,8 +48,8 @@ export function WorkoutPage(props: Props): ReactElement {
         var waitingToStartState: WorkoutState = { status: 'waitingToStart', duration: secondsBeforeStarting }
         var endedState: WorkoutState = { status: 'ended' }
 
-        var workout: WorkoutState[] = clone(workoutState.workout).map(createWorkoutStateFromExercise)
-        var workoutWithBreaks: WorkoutState[] = intersperse(breakState, workout)
+        var workoutWithExercises: WorkoutState[] = clone(workoutState.workout).map(createWorkoutStateFromExercise)
+        var workoutWithBreaks: WorkoutState[] = intersperse(breakState, workoutWithExercises)
 
         return [notStartedState, waitingToStartState, ...workoutWithBreaks, endedState]
     })()
