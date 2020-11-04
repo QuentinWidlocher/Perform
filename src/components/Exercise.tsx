@@ -1,19 +1,19 @@
-import { map, not, pluck, prop, sum } from 'ramda'
-import React, { ReactElement, useState } from 'react'
+import { map, move, prop, sum } from 'ramda'
+import React, { ReactElement } from 'react'
+import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd'
+import { MdDragHandle } from 'react-icons/md'
 import { RiCheckboxBlankCircleLine, RiCheckboxCircleLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 import { Box, Button, Card, Flex, Heading, Image } from 'rebass'
-import { SelectableExercises } from '../pages/Exercises'
 import { workoutState } from '../services/Workout'
 import { theme } from '../theme'
 
 const exerciseTypes = [
     'thighs',
     'arms',
-    'back',
+    'abs',
     'buttocks',
     'cardio',
-    'abs'
 ] as const
 
 type ExerciseType = typeof exerciseTypes[number]
@@ -21,7 +21,7 @@ type ExerciseType = typeof exerciseTypes[number]
 const exerciseTypeColors = new Map<ExerciseType, string>([
     ['thighs', 'green'],
     ['arms', 'orange'],
-    ['back', 'indigo'],
+    ['abs', 'indigo'],
     ['buttocks', 'blue'],
     ['cardio', 'red'],
 ])
@@ -33,9 +33,9 @@ export type Exercise = {
     tags: ExerciseType[]
 }
 
-export function ExerciseCard(ex: SelectableExercises & { onClick: () => void }): ReactElement {
+export function ExerciseCard(ex: Exercise & { onClick: () => void, selected: boolean }): ReactElement {
 
-    var tags = ex.tags.map(tag => {
+    var tags = ex.tags.map((tag, index) => {
 
         var tagColor = exerciseTypeColors.get(tag);
 
@@ -43,7 +43,7 @@ export function ExerciseCard(ex: SelectableExercises & { onClick: () => void }):
             var tagColorHex = (theme.colors as any)[tagColor];
 
             return (
-                <Box as='span' variant='badge' color={tagColor} sx={{ borderColor: tagColor, backgroundColor: `${tagColorHex}20` }}>
+                <Box as='span' variant='badge' color={tagColor} sx={{ borderColor: tagColor, backgroundColor: `${tagColorHex}20` }} key={`${tag}-${index}`}>
                     {tag.toLocaleUpperCase()}
                 </Box>
             )
@@ -76,7 +76,12 @@ export function ExerciseCard(ex: SelectableExercises & { onClick: () => void }):
     )
 }
 
-export function ExerciseList({ exs }: { exs: Exercise[] }): ReactElement | null {
+type ExerciseListProps = { 
+    exs: Exercise[], 
+    exsChange?: (exs: Exercise[]) => void 
+}
+
+export function ExerciseList({ exs, exsChange }: ExerciseListProps): ReactElement | null {
 
     if (!exs || exs.length <= 0) {
         return null
@@ -94,29 +99,63 @@ export function ExerciseList({ exs }: { exs: Exercise[] }): ReactElement | null 
         </li>
     )
 
-    var exerciseList = exs.map((ex, i) => (
-        <li key={`${ex.name}-${i}-list`}>
-            <Flex justifyContent="space-between">
-                <Box mr={3}>
-                    {ex.name}
-                </Box>
-                <Box>
-                    {`${ex.duration}s`}
-                </Box>
-            </Flex>
-        </li>
-    ))
+    var itemStyle = {
+        p: 3,
+        mx: -3,
+        backgroundColor: 'white',
+        '&:hover': {
+            backgroundColor: theme.colors.greyLight
+        }
+    }
+
+    var ExerciseListWithoutTotal = () => (
+        <React.Fragment>
+            {exs.map((ex, i) => (
+                <Draggable key={`${ex.name}-${i}-list`} draggableId={`${ex.name}-${i}`} index={i} >
+                    {(provided) => (
+                        <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                            <Flex sx={itemStyle}>
+                                <MdDragHandle />
+                                <Box ml={3} mr='auto'>
+                                    {ex.name}
+                                </Box>
+                                <Box>
+                                    {`${ex.duration}s`}
+                                </Box>
+                            </Flex>
+                        </li>
+                    )}
+                </Draggable>
+            ))}
+        </React.Fragment>
+    )
+
+    var dragReorder = ({source, destination}: DropResult) => {
+        if (!!destination && source.index !== destination.index && !!exsChange) {
+            console.debug(source, destination, !!exsChange)
+            exsChange(move(source.index, destination.index, exs))
+        }
+    }
 
     return (
-        <ul>
-            {exerciseList}
-            <hr />
-            {listTotal}
-        </ul>
+        <DragDropContext onDragEnd={dragReorder}>
+            <ul>
+                <Droppable droppableId='ExerciseList'>
+                    {(provided) => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <ExerciseListWithoutTotal/>
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+                <hr />
+                {listTotal}
+            </ul>
+        </DragDropContext>
     )
 }
 
-export function ExerciseListCard({ exs }: { exs: Exercise[] }): ReactElement | null {
+export function ExerciseListCard({ exs, exsChange }: ExerciseListProps): ReactElement | null {
 
     var popupStyle = {
         position: "fixed",
@@ -134,7 +173,7 @@ export function ExerciseListCard({ exs }: { exs: Exercise[] }): ReactElement | n
     return exs.length > 0 ? (
         <Card sx={popupStyle}>
             <Heading mb={3}>Selected exercises</Heading>
-            <ExerciseList {...{ exs }} />
+            <ExerciseList {...{ exs }} exsChange={exsChange}/>
             <Link to='/workout' title="Start your workout">
                 <Button variant='primaryGradient' mt={3} p={3} width='100%' onClick={onStartButtonClick}>
                     Let's GO.

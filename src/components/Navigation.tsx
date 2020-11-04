@@ -1,5 +1,5 @@
 import { propEq } from "ramda";
-import React, { FC, ReactElement } from "react"
+import React from "react";
 import { NavLink, Route, Switch } from 'react-router-dom';
 import { Box, BoxProps, Flex, FlexProps, Heading, Link as RebassLink, LinkProps as RebassLinkProps } from 'rebass';
 

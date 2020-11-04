@@ -1,7 +1,6 @@
 import React from 'react'
-import { useState } from 'react'
-import { Link, LinkProps, NavLink } from 'react-router-dom'
-import { Box, Button, ButtonProps, Flex, FlexProps, Heading } from 'rebass'
+import { Link } from 'react-router-dom'
+import { Box, Button, Flex, FlexProps, Heading } from 'rebass'
 
 interface Props {
 

@@ -9,10 +9,12 @@
         "@testing-library/react": "^9.3.2",
         "@testing-library/user-event": "^7.1.2",
         "@types/ramda": "^0.27.30",
+        "@types/react-beautiful-dnd": "^13.0.0",
         "emotion-theming": "^10.0.27",
         "eslint-plugin-react-hooks": "^4.2.0",
         "ramda": "^0.27.1",
         "react": "^16.14.0",
+        "react-beautiful-dnd": "^13.0.0",
         "react-dom": "^16.14.0",
         "react-icons": "^3.11.0",
         "react-router-dom": "^5.2.0",
@@ -35,7 +37,8 @@
         ],
         "rules": {
             "react-hooks/rules-of-hooks": "error",
-            "react-hooks/exhaustive-deps": "warn"
+            "react-hooks/exhaustive-deps": "warn",
+            "eqeqeq": "smart"
         }
     },
     "browserslist": {
