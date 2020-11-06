@@ -47,11 +47,11 @@ export function HomePage(props: Props) {
                         <em>Commit</em> to be fit. <span role='img' aria-label='muscle'>💪</span>
                     </Heading>
                     <Flex width={['100%', '75%']}>
-                        <Link to='/exercises' title="Exercices">
+                        {/* <Link to='/exercises' title="Exercices">
                             <Button variant='primary.hero.outline' mr="2" flex='1'>
                                 Start Training
                             </Button>
-                        </Link>
+                        </Link> */}
                         <Link to='/exercises' title="Exercices">
                             <Button variant='primary.hero.full' mr="2" flex='1'>
                                 See exercices
