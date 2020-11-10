@@ -32,7 +32,7 @@ const nextSteps: { current: Status, next: Status }[] = [
 export function WorkoutPage(): ReactElement {
 
     const secondsBeforeStarting = 5
-    const secondsToRest = 30
+    const secondsToRest = 15
 
     //#region States
 
