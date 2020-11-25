@@ -1,10 +1,10 @@
-import { map, move, prop, sum } from 'ramda'
+import { filter, map, move, prop, sum } from 'ramda'
 import React, { ReactElement } from 'react'
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd'
 import { MdDragHandle } from 'react-icons/md'
 import { RiCheckboxBlankCircleLine, RiCheckboxCircleLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
-import { Box, Button, Card, Flex, Heading, Image } from 'rebass'
+import { Box, Button, Card, Flex, Heading, Image, ImageProps } from 'rebass'
 import { workoutState } from '../services/Workout'
 import { theme } from '../theme'
 
@@ -29,6 +29,7 @@ const exerciseTypeColors = new Map<ExerciseType, string>([
 export type Exercise = {
     name: string,
     images?: string[],
+    steps: number,
     duration: number,
     tags: ExerciseType[]
 }
@@ -58,10 +59,16 @@ export function ExerciseCard(ex: Exercise & { onClick: () => void, selected: boo
         </Box>
     )
 
+    var imageStyle: ImageProps = {
+        sx: {
+            filter: 'hue-rotate(120deg) saturate(1.5)'
+        }
+    }
+
     return (
         <Flex as='li' width={[1, 1 / 2, 1 / 3]} p={3} onClick={ex.onClick}>
             <Card variant="card.clickable" width='100%' height='100%'>
-                <Image variant='card.image' src={ex.images && ex.images[0]} />
+                <Image variant='card.image' src={ex.images && ex.images[0]} sx={imageStyle.sx} />
                 <Flex variant='card.body'>
                     <Flex flexDirection="column" flex={1}>
                         <Heading color='primary'>{ex.name} ({ex.duration}s)</Heading>
@@ -158,7 +165,6 @@ export function ExerciseList({ exs, exsChange }: ExerciseListProps): ReactElemen
 export function ExerciseListCard({ exs, exsChange }: ExerciseListProps): ReactElement | null {
 
     var popupStyle = {
-        position: "fixed",
         bottom: 0,
         right: 0,
         m: [0, 4],
