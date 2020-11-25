@@ -21,6 +21,9 @@
     },
     "scripts": {
         "start": "react-scripts start",
+        "start:dev": "yarn start",
+        "start:prod": "yarn build && serve ./build",
+        "start:prod:pwa": "yarn start:prod & npx localtunnel --port 5000",
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
