@@ -1,0 +1,189 @@
+[
+    {
+        "name": "Squats",
+        "steps": 1,
+        "duration": 60,
+        "tags": [
+            "thighs",
+            "buttocks"
+        ],
+        "images": [
+            "assets/exercises/squats01.jpg",
+            "assets/exercises/squats02.gif"
+        ]
+    },
+    {
+        "name": "Push-ups",
+        "steps": 1,
+        "duration": 30,
+        "tags": [
+            "arms"
+        ],
+        "images": [
+            "assets/exercises/push-ups01.jpg",
+            "assets/exercises/push-ups02.gif"
+        ]
+    },
+    {
+        "name": "Mountain Climbers",
+        "steps": 1,
+        "duration": 30,
+        "tags": [
+            "arms",
+            "abs",
+            "thighs"
+        ],
+        "images": [
+            "assets/exercises/mountain-climbers01.jpg",
+            "assets/exercises/mountain-climbers02.gif"
+        ]
+    },
+    {
+        "name": "Lunges",
+        "steps": 1,
+        "duration": 60,
+        "tags": [
+            "thighs",
+            "buttocks"
+        ],
+        "images": [
+            "assets/exercises/lunges01.jpg",
+            "assets/exercises/lunges02.gif"
+        ]
+    },
+    {
+        "name": "Jumping Jacks",
+        "steps": 1,
+        "duration": 45,
+        "tags": [
+            "cardio",
+            "thighs"
+        ],
+        "images": [
+            "assets/exercises/jumping-jacks01.jpg",
+            "assets/exercises/jumping-jacks02.gif"
+        ]
+    },
+    {
+        "name": "Bench Dips",
+        "steps": 1,
+        "duration": 20,
+        "tags": [
+            "arms"
+        ],
+        "images": [
+            "assets/exercises/tricep-dips01.jpg",
+            "assets/exercises/tricep-dips02.gif"
+        ]
+    },
+    {
+        "name": "Arms Swings",
+        "steps": 1,
+        "duration": 60,
+        "tags": [
+            "arms"
+        ],
+        "images": [
+            "assets/exercises/arm-swings01.jpg",
+            "assets/exercises/arm-swings02.gif"
+        ]
+    },
+    {
+        "name": "Plank",
+        "steps": 1,
+        "duration": 40,
+        "tags": [
+            "abs"
+        ],
+        "images": [
+            "assets/exercises/plank01.jpg",
+            "assets/exercises/plank01.jpg"
+        ]
+    },
+    {
+        "name": "Plank Leg Lifts",
+        "steps": 1,
+        "duration": 40,
+        "tags": [
+            "abs",
+            "thighs"
+        ],
+        "images": [
+            "assets/exercises/plank-leg-lifts01.jpg",
+            "assets/exercises/plank-leg-lifts02.gif"
+        ]
+    },
+    {
+        "name": "Triceps Extension",
+        "steps": 1,
+        "duration": 60,
+        "tags": [
+            "arms"
+        ],
+        "images": [
+            "assets/exercises/triceps-extension01.jpg",
+            "assets/exercises/triceps-extension02.gif"
+        ]
+    },
+    {
+        "name": "Overhead Circles",
+        "steps": 1,
+        "duration": 60,
+        "tags": [
+            "arms"
+        ],
+        "images": [
+            "assets/exercises/overhead-circles01.jpg",
+            "assets/exercises/overhead-circles02.gif"
+        ]
+    },
+    {
+        "name": "Bridge",
+        "steps": 1,
+        "duration": 60,
+        "tags": [
+            "abs",
+            "arms"
+        ],
+        "images": [
+            "assets/exercises/bridge01.jpg",
+            "assets/exercises/bridge02.gif"
+        ]
+    },
+    {
+        "name": "Donkey Kicks",
+        "steps": 2,
+        "duration": 40,
+        "tags": [
+            "abs"
+        ],
+        "images": [
+            "assets/exercises/donkey-kicks01.jpg",
+            "assets/exercises/donkey-kicks02.gif"
+        ]
+    },
+    {
+        "name": "Skaters",
+        "steps": 1,
+        "duration": 30,
+        "tags": [
+            "thighs"
+        ],
+        "images": [
+            "assets/exercises/skaters01.jpg",
+            "assets/exercises/skaters02.gif"
+        ]
+    },
+    {
+        "name": "Side Lunges",
+        "steps": 1,
+        "duration": 40,
+        "tags": [
+            "thighs"
+        ],
+        "images": [
+            "assets/exercises/side-lunge01.jpg",
+            "assets/exercises/side-lunge02.gif"
+        ]
+    }
+]
