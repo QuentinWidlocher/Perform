@@ -18,6 +18,10 @@ export var theme = {
     primaryLight: '#ff7961',
     primaryDark: '#ba000d',
 
+    danger: '#f44336',
+    dangerLight: '#ff7961',
+    dangerDark: '#ba000d',
+
     red: '#f44336',
     redLight: '#ff7961',
     redDark: '#ba000d',

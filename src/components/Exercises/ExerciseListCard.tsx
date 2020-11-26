@@ -56,8 +56,8 @@ export function ExerciseListCard(props: ExerciseListProps): ReactElement | null 
     return props.exs.length > 0 ? (
         <Box {...popupStyle}>
             <Card {...cardStyle}>
-                <Box height={headerSize}>
-                    <Flex justifyContent="center" onClick={toggleExpanded}>
+                <Box height={headerSize} sx={{cursor: 'pointer'}} onClick={toggleExpanded}>
+                    <Flex justifyContent="center">
                         { expanded
                             ? <RiArrowDownSLine size='1.7rem' />
                             : <RiArrowUpSLine size='1.7rem' /> 
@@ -80,7 +80,6 @@ export function ExerciseListCard(props: ExerciseListProps): ReactElement | null 
                         }
                     }}
                 >
-                    <RiCloseLine style={{verticalAlign: 'text-bottom'}} />
                     Clear exercise list
                 </Button>
 

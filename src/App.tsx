@@ -17,7 +17,7 @@ export default function App() {
   var links: LinkItem[] = [
     { Page: HomePage, name: <RiHome2Line />, url: '/', showInNavbar: true },
     { Page: ExercisesPage, name: <MdFitnessCenter />, url: '/exercises', showInNavbar: true },
-    { Page: SettingsPage, name: <RiSettings3Line />, url: '/settings', showInNavbar: true },
+    // { Page: SettingsPage, name: <RiSettings3Line />, url: '/settings', showInNavbar: true },
     { Page: WorkoutPage, name: 'Workout', url: '/workout', showInNavbar: false },
   ]
 

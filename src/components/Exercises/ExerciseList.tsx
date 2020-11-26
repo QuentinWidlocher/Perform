@@ -2,7 +2,7 @@ import { sum, map, prop, move, without, findIndex, remove } from "ramda"
 import React, { ReactElement } from "react"
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd"
 import { MdDragHandle } from "react-icons/md"
-import { RiDeleteBinLine } from "react-icons/ri"
+import { RiCloseCircleLine, RiCloseLine, RiDeleteBinLine } from "react-icons/ri"
 import { Flex, Box } from "rebass"
 import { theme } from "../../theme"
 import { Exercise, ExerciseListProps, getTagsFromExercice, getTotalDurationString } from "./Exercise"
@@ -47,7 +47,7 @@ export function ExerciseList({ exs, exsChange, displayTotal, canDelete, canReord
                 <Draggable key={`${ex.name}-${i}-list`} draggableId={`${ex.name}-${i}`} index={i} isDragDisabled={!canReorder}>
                     {(provided) => (
                         <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <Flex sx={itemStyle} px='4'>
+                            <Flex sx={itemStyle} px='4' alignItems='center'>
                                 <Box>
                                     {canReorder && <MdDragHandle />}
                                 </Box>
@@ -60,8 +60,8 @@ export function ExerciseList({ exs, exsChange, displayTotal, canDelete, canReord
                                 <Box ml='1'>
                                     {`${ex.duration}s`}
                                 </Box>
-                                <Box ml='1'>
-                                    {canDelete && <RiDeleteBinLine onClick={() => deleteExercise(ex)} />}
+                                <Box ml='2' color='danger'>
+                                    {canDelete && <RiCloseCircleLine size={24} onClick={() => deleteExercise(ex)} />}
                                 </Box>
                             </Flex>
                         </li>
