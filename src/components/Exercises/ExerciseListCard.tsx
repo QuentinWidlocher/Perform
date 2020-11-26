@@ -7,11 +7,11 @@ import { workoutState } from "../../services/Workout"
 import { ExerciseListProps, getTotalDurationString } from "./Exercise"
 import { ExerciseList } from "./ExerciseList"
 
-export function ExerciseListCard({ exs, exsChange }: ExerciseListProps): ReactElement | null {
+export function ExerciseListCard(props: ExerciseListProps): ReactElement | null {
 
     const [expanded, setExpanded] = useState(false)
 
-    var totalDurationStr = getTotalDurationString(exs)
+    var totalDurationStr = getTotalDurationString(props.exs)
 
     var headerSize = '5rem'
 
@@ -45,12 +45,12 @@ export function ExerciseListCard({ exs, exsChange }: ExerciseListProps): ReactEl
     }
 
     var onStartButtonClick = () => {
-        workoutState.workout = exs
+        workoutState.workout = props.exs
     }
 
     var toggleExpanded = () => setExpanded(!expanded)
 
-    return exs.length > 0 ? (
+    return props.exs.length > 0 ? (
         <Box {...popupStyle}>
             <Card {...cardStyle}>
                 <Box height={headerSize}>
@@ -61,7 +61,7 @@ export function ExerciseListCard({ exs, exsChange }: ExerciseListProps): ReactEl
                         }
                     </Flex>
                     <Flex justifyContent="space-between" alignItems="center">
-                        <Heading>{exs.length} exercice{exs.length > 1 ? 's' : ''}</Heading>
+                        <Heading>{props.exs.length} exercice{props.exs.length > 1 ? 's' : ''}</Heading>
                         <Heading fontSize={16} fontWeight={500}>{totalDurationStr}</Heading>
                     </Flex>
                 </Box>
@@ -71,8 +71,8 @@ export function ExerciseListCard({ exs, exsChange }: ExerciseListProps): ReactEl
                     width='100%' 
                     sx={{textAlign: 'center'}}
                     onClick={() => {
-                        if (!!exsChange) {
-                            exsChange([])
+                        if (!!props.exsChange) {
+                            props.exsChange([])
                             setExpanded(false)
                         }
                     }}
@@ -81,7 +81,7 @@ export function ExerciseListCard({ exs, exsChange }: ExerciseListProps): ReactEl
                     Clear exercise list
                 </Button>
 
-                <ExerciseList {...{ exs }} exsChange={exsChange} />
+                <ExerciseList {...props} />
 
                 <Link to='/workout' title="Start your workout">
                     <Button variant='primary.gradient' mt={3} p={3} width='100%' onClick={onStartButtonClick}>

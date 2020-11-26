@@ -368,7 +368,13 @@ export function WorkoutPage(): ReactElement {
                 >
                     <Heading color='primary' fontSize='3rem'>Perform.</Heading>
                     <Box>
-                        <ExerciseList exs={exerciseList} exsChange={setExerciseList} />
+                        <ExerciseList 
+                            exs={exerciseList} 
+                            exsChange={setExerciseList} 
+                            canDelete={false}
+                            canReorder={true}
+                            displayTotal={true}
+                        />
                     </Box>
                 </Box>)
         } else {

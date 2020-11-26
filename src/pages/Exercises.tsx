@@ -58,7 +58,13 @@ export function ExercisesPage(props: any) {
                 <MemoizedExerciseCardsList/>
             </Box>
             <aside>
-                <ExerciseListCard exs={selectedExercises} exsChange={setSelectedExercises} />
+                <ExerciseListCard 
+                    exs={selectedExercises} 
+                    exsChange={setSelectedExercises}
+                    canDelete={true}
+                    canReorder={false}
+                    displayTotal={false}
+                />
             </aside>
         </>
     )

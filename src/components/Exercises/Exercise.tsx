@@ -28,7 +28,10 @@ export type Exercise = {
 
 export type ExerciseListProps = {
     exs: Exercise[],
-    exsChange?: (exs: Exercise[]) => void
+    exsChange?: (exs: Exercise[]) => void,
+    displayTotal: boolean,
+    canReorder: boolean,
+    canDelete: boolean,
 }
 
 export var getTotalDuration = (exs: Exercise[]) => sum(map(prop('duration'), exs))
