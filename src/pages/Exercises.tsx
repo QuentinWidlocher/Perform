@@ -4,10 +4,11 @@ import { Box, Flex } from 'rebass'
 import { Exercise, ExerciseCard, ExerciseListCard } from '../components/Exercise'
 import { TitleBar } from '../components/TitleBar'
 import { workoutState } from '../services/Workout'
+import {default as exercises} from "../assets/exercises.json"
 
 export function ExercisesPage(props: any) {
 
-    var exerciseList: Exercise[] = 
+    var exerciseList = exercises as Exercise[]
 
     const [selectedExercises, setSelectedExercises] = useState<Exercise[]>(workoutState.workout)
 
