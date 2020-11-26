@@ -5,7 +5,8 @@ import { MdDragHandle } from "react-icons/md"
 import { RiDeleteBinLine } from "react-icons/ri"
 import { Flex, Box } from "rebass"
 import { theme } from "../../theme"
-import { Exercise, ExerciseListProps, getTotalDurationString } from "./Exercise"
+import { Exercise, ExerciseListProps, getTagsFromExercice, getTotalDurationString } from "./Exercise"
+import { Tag } from "./Tag"
 
 export function ExerciseList({ exs, exsChange, displayTotal, canDelete, canReorder }: ExerciseListProps): ReactElement | null {
 
@@ -46,15 +47,22 @@ export function ExerciseList({ exs, exsChange, displayTotal, canDelete, canReord
                 <Draggable key={`${ex.name}-${i}-list`} draggableId={`${ex.name}-${i}`} index={i} isDragDisabled={!canReorder}>
                     {(provided) => (
                         <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <Flex sx={itemStyle}>
-                                {canReorder && <MdDragHandle />}
-                                <Box ml={3} mr='auto'>
+                            <Flex sx={itemStyle} px='4'>
+                                <Box>
+                                    {canReorder && <MdDragHandle />}
+                                </Box>
+                                <Box mr='auto'>
                                     {ex.name}
                                 </Box>
-                                <Box>
+                                <Box ml={1}>
+                                    { getTagsFromExercice(ex) }
+                                </Box>
+                                <Box ml='1'>
                                     {`${ex.duration}s`}
                                 </Box>
-                                {canDelete && <RiDeleteBinLine onClick={() => deleteExercise(ex)} style={{marginLeft: '10'}} />}
+                                <Box ml='1'>
+                                    {canDelete && <RiDeleteBinLine onClick={() => deleteExercise(ex)} />}
+                                </Box>
                             </Flex>
                         </li>
                     )}
@@ -75,7 +83,7 @@ export function ExerciseList({ exs, exsChange, displayTotal, canDelete, canReord
             return (
                 <React.Fragment>
                     <hr />
-                    { listTotal}
+                    { listTotal }
                 </React.Fragment>
             )
         } else {
@@ -85,7 +93,7 @@ export function ExerciseList({ exs, exsChange, displayTotal, canDelete, canReord
 
     return (
         <DragDropContext onDragEnd={dragReorder}>
-            <Box as="ul" overflowY="auto" overflowX="hidden">
+            <Box as="ul" overflowY="auto" overflowX="hidden" p='2px'>
                 <Droppable droppableId='ExerciseList' isDropDisabled={!canReorder}>
                     {(provided) => (
                         <div ref={provided.innerRef} {...provided.droppableProps}>

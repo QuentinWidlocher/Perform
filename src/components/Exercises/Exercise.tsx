@@ -1,6 +1,8 @@
 import { map, prop, sum } from "ramda"
+import React from "react"
+import { Tag } from "./Tag"
 
-const exerciseTypes = [
+export const exerciseTypes = [
     'thighs',
     'arms',
     'abs',
@@ -8,7 +10,7 @@ const exerciseTypes = [
     'cardio',
 ] as const
 
-type ExerciseType = typeof exerciseTypes[number]
+export type ExerciseType = typeof exerciseTypes[number]
 
 export const exerciseTypeColors = new Map<ExerciseType, string>([
     ['thighs', 'green'],
@@ -37,3 +39,5 @@ export type ExerciseListProps = {
 export var getTotalDuration = (exs: Exercise[]) => sum(map(prop('duration'), exs))
 export var totalDurationToString = (totalDuration: number) => totalDuration > 60 ? `${~~(totalDuration / 60)}m ${~~(totalDuration % 60)}s` : `${totalDuration}s`
 export var getTotalDurationString = (exs: Exercise[]) => totalDurationToString(getTotalDuration(exs))
+
+export var getTagsFromExercice = (ex: Exercise) => ex.tags.map((tag, index) => (<Tag tag={tag} key={`${tag}-${index}`} />))

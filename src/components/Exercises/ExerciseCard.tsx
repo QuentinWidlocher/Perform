@@ -1,27 +1,10 @@
 import React, { ReactElement } from "react";
 import { RiCheckboxCircleLine, RiCheckboxBlankCircleLine } from "react-icons/ri";
-import { Box, Card, Flex, Heading, ImageProps, Image } from "rebass";
-import { theme } from "../../theme";
-import { Exercise, exerciseTypeColors } from "./Exercise";
+import { Box, Card, Flex, Heading, Image } from "rebass";
+import { Exercise, getTagsFromExercice } from "./Exercise";
+import { Tag } from "./Tag";
 
 export function ExerciseCard(ex: Exercise & { onClick: () => void, selected: boolean }): ReactElement {
-
-    var tags = ex.tags.map((tag, index) => {
-
-        var tagColor = exerciseTypeColors.get(tag);
-
-        if (!!tagColor) {
-            var tagColorHex = (theme.colors as any)[tagColor];
-
-            return (
-                <Box as='span' variant='badge' color={tagColor} sx={{ borderColor: tagColor, backgroundColor: `${tagColorHex}20` }} key={`${tag}-${index}`}>
-                    {tag.toLocaleUpperCase()}
-                </Box>
-            )
-        } else {
-            return null
-        }
-    })
 
     var Check = () => (
         <Box m="auto" p={3} fontSize={5} opacity={ex.selected ? 1 : 0.3} color={ex.selected ? 'primary' : 'black'}>
@@ -37,7 +20,7 @@ export function ExerciseCard(ex: Exercise & { onClick: () => void, selected: boo
                     <Flex flexDirection="column" flex={1}>
                         <Heading color='primary'>{ex.name} ({ex.duration}s)</Heading>
                         <Flex>
-                            {tags}
+                            { getTagsFromExercice(ex) }
                         </Flex>
                     </Flex>
                     <Check />

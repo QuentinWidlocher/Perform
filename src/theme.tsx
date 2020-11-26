@@ -5,6 +5,8 @@ var spacer = 1
 var borderWidth = '3px'
 var borderRadius = 4
 
+var redTint = 'hue-rotate(137deg) saturate(20) contrast(1.2)'
+
 export var theme = {
   breakpoints: ['50em', '70em', '80em'],
   fontSizes: [
@@ -132,7 +134,7 @@ export var theme = {
         height: '20rem',
         
         redTint: {
-          filter: 'hue-rotate(120deg) saturate(1.5)'
+          filter: redTint
         }
       },
 
@@ -167,7 +169,7 @@ export var theme = {
     },
     image : {
       redTint: {
-        filter: 'hue-rotate(120deg) saturate(1.5)'
+        filter: redTint
       }
     }
   },
