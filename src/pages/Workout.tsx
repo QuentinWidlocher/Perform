@@ -1,4 +1,4 @@
-import { any, clone, equals, filter, intersperse, isEmpty, isNil, map, not, prop, range, reject, sum } from 'ramda'
+import { any, clone, equals, filter, intersperse, isEmpty, isNil, map, not, prop, range, reject, sum, uniqBy } from 'ramda'
 import React, { CSSProperties, ReactElement, useEffect, useState } from 'react'
 import { IconBaseProps } from 'react-icons/lib'
 import { RiPauseCircleLine, RiPlayLine, RiSkipForwardLine } from 'react-icons/ri'
@@ -356,7 +356,10 @@ export function WorkoutPage(): ReactElement {
             if (!workout || isEmpty(workout)) {
                 var createdWorkout = createWorkoutFromExercises()
                 setWorkout(createdWorkout)
-                workoutState.workout = createdWorkout.map(w => w.exercise).filter((e): e is Exercise => isNotNil(e))
+
+                var exerciseListWithDuplicates = createdWorkout.map(w => w.exercise).filter((e): e is Exercise => isNotNil(e))
+                var exerciseList = uniqBy(prop('name'), exerciseListWithDuplicates)
+                workoutState.workout = exerciseList
             }
 
             goToNextStep()
