@@ -129,10 +129,12 @@ export function WorkoutPage(): ReactElement {
         var workoutWithExercises: WorkoutStep[] = clone(exercises).flatMap(createWorkoutStepsFromExercise)
         var workoutWithBreaks: WorkoutStep[] = intersperse(breakState, workoutWithExercises)
 
+        // wait ->m e1:1 -> break -> e2:1 -> break -> e2:2 -> break -> e3:1 -> end
+    
         var removeBreakBetweenSteps = (v: WorkoutStep, i: number, a: WorkoutStep[]) => {
             if (i + 1 <= a.length && v.status == 'breakBeforeNext') {
                 var nextItem = a[i + 1]
-                if (!!nextItem?.step && nextItem.step > 0) {
+                if (!!nextItem?.step && nextItem.step > 1) {
                     return undefined
                 }
             }
