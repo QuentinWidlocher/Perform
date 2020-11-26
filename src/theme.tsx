@@ -113,7 +113,7 @@ export var theme = {
   },
   shadows: {
     small: '0 0 4px rgba(0, 0, 0, .125)',
-    large: '0 0 10px rgba(0, 0, 0, .125)',
+    large: '0 0 20px rgba(0, 0, 0, .3)',
   },
   variants: {
     gradient: {
@@ -193,10 +193,27 @@ export var theme = {
             bg: 'primary',
           },
         }
-      }
-    },
-    primaryGradient: {
-      background: 'linear-gradient(45deg, #ff416c, #ff4b2b)',
+      },
+
+      outline : {
+        border: 'solid',
+        borderColor: 'transparent',
+        borderWidth: borderWidth,
+        color: 'primary',
+        background: 'none',
+
+        '&:hover': {
+          borderColor: 'primary',
+        }
+      },
+
+      gradient: {
+        background: 'linear-gradient(45deg, #ff416c, #ff4b2b)',
+
+        '&:hover': {
+          background: 'linear-gradient(50deg, #ff416c, #ff4b2b)',
+        }
+      },
     },
   }
 }

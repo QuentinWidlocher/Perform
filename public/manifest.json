@@ -4,7 +4,7 @@
   "description": "Commit to be fit 💪",
   "lang": "en-US",
   "start_url": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "theme_color": "#f44336",
   "icons": [
     {

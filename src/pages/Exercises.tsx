@@ -1,10 +1,12 @@
 import { findIndex, includes, propEq, remove } from 'ramda'
 import React, { useState } from 'react'
 import { Box, Flex } from 'rebass'
-import { Exercise, ExerciseCard, ExerciseListCard } from '../components/Exercise'
+import { Exercise } from '../components/Exercises/Exercise'
 import { TitleBar } from '../components/TitleBar'
 import { workoutState } from '../services/Workout'
-import {default as exercises} from "../assets/exercises.json"
+import { default as exercises } from '../assets/exercises.json'
+import { ExerciseCard } from '../components/Exercises/ExerciseCard'
+import { ExerciseListCard } from '../components/Exercises/ExerciseListCard'
 
 export function ExercisesPage(props: any) {
 
@@ -52,7 +54,7 @@ export function ExercisesPage(props: any) {
             <TitleBar>
                 Available Exercises
             </TitleBar>
-            <Box as='main' mb='10rem'>
+            <Box as='main' mb='5rem'>
                 <MemoizedExerciseCardsList/>
             </Box>
             <aside>

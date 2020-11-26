@@ -1,4 +1,4 @@
-import { Exercise } from '../components/Exercise';
+import { Exercise } from '../components/Exercises/Exercise';
 
 export class WorkoutState {
     private _workout?: Exercise[]

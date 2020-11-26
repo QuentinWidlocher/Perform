@@ -6,8 +6,8 @@ import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, FlexProps, Heading, Image } from 'rebass'
 import useSound from 'use-sound'
-import { Exercise, ExerciseList } from '../components/Exercise'
-import { notNil } from '../services/Helpers'
+import { Exercise } from '../components/Exercises/Exercise'
+import { ExerciseList } from '../components/Exercises/ExerciseList'
 import { workoutState } from '../services/Workout'
 
 const dingSound = require('../assets/sounds/ding.mp3')
@@ -362,9 +362,14 @@ export function WorkoutPage(): ReactElement {
     var WhiteScreen = () => {
         if (!isWorkoutStarted()) {
             return (
-                <Box m='auto'>
+                <Box 
+                    m='auto'
+                    py='3'
+                >
                     <Heading color='primary' fontSize='3rem'>Perform.</Heading>
-                    <ExerciseList exs={exerciseList} exsChange={setExerciseList}/>
+                    <Box>
+                        <ExerciseList exs={exerciseList} exsChange={setExerciseList} />
+                    </Box>
                 </Box>)
         } else {
             return <ExerciceImage />
@@ -397,7 +402,13 @@ export function WorkoutPage(): ReactElement {
     //#region Page
     var page = !!workoutState.workout && workoutState.workout.length > 0 ? (
         <Flex {...fullscreenClass} flexDirection={['column', 'row']}>
-            <Box {...splitScreenClass} sx={{ flexBasis: '100%', ...stackableGridStyles }} backgroundColor="white" color="black">
+            <Box 
+                {...splitScreenClass} 
+                sx={{ flexBasis: '100%', ...stackableGridStyles }} 
+                backgroundColor="white" 
+                color="black"
+                overflowY='auto'
+            >
                 <WhiteScreen />
             </Box>
             <Flex {...splitScreenClass} p={2}>
