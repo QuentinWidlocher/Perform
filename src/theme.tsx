@@ -130,6 +130,10 @@ export var theme = {
         objectFit: 'cover',
         width: '100%',
         height: '20rem',
+        
+        redTint: {
+          filter: 'hue-rotate(120deg) saturate(1.5)'
+        }
       },
 
       clickable: {
@@ -160,6 +164,11 @@ export var theme = {
       '&:last-of-type': {
         mr: 0,
       },
+    },
+    image : {
+      redTint: {
+        filter: 'hue-rotate(120deg) saturate(1.5)'
+      }
     }
   },
   text: {

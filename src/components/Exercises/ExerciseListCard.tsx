@@ -18,9 +18,12 @@ export function ExerciseListCard(props: ExerciseListProps): ReactElement | null 
     var popupStyle: BoxProps = {
         sx: {
             position: 'fixed',
-            bottom: [0, '1rem'],
+            bottom: 0,
             right: [0, '1rem'],
-            transform: `translateY(${expanded ? '0' : `calc(100% - ${headerSize})`})`,
+            transform: [
+                `translateY(${expanded ? '0' : `calc(100% - ${headerSize})`})`,
+                `translateY(${expanded ? '1rem' : `calc(100% - ${headerSize} - 2rem)`})`
+            ],
             mb: expanded ? 3 : 0,
             px: 3,
             width: ['100%', 'initial'],

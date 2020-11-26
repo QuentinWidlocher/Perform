@@ -1,13 +1,14 @@
 import { any, clone, equals, filter, intersperse, isEmpty, isNil, map, not, prop, range, reject, sum } from 'ramda'
 import React, { CSSProperties, ReactElement, useEffect, useState } from 'react'
 import { IconBaseProps } from 'react-icons/lib'
-import { RiPauseCircleLine, RiPlayLine } from 'react-icons/ri'
+import { RiPauseCircleLine, RiPlayLine, RiSkipForwardLine } from 'react-icons/ri'
 import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, FlexProps, Heading, Image } from 'rebass'
 import useSound from 'use-sound'
 import { Exercise } from '../components/Exercises/Exercise'
 import { ExerciseList } from '../components/Exercises/ExerciseList'
+import { isNotNil } from '../services/Helpers'
 import { workoutState } from '../services/Workout'
 
 const dingSound = require('../assets/sounds/ding.mp3')
@@ -109,7 +110,7 @@ export function WorkoutPage(): ReactElement {
         // setProgression(progression + 1)
     }
 
-    var createWorkoutFromExercises = (exercises: Exercise[] = exerciseList) => {
+    var createWorkoutFromExercises = (exercises: Exercise[] = exerciseList): WorkoutStep[] => {
 
         var createWorkoutStepsFromExercise = (e: Exercise): WorkoutStep[] => {
             return range(0, e.steps).map((_, i) => (
@@ -142,7 +143,6 @@ export function WorkoutPage(): ReactElement {
         }
 
         workoutWithBreaks = workoutWithBreaks.map(removeBreakBetweenSteps).filter((x): x is WorkoutStep => !isNil(x))
-        console.debug(workoutWithBreaks)
 
         return [waitingToStartState, ...workoutWithBreaks, endedState]
     }
@@ -273,48 +273,78 @@ export function WorkoutPage(): ReactElement {
             return null
         } else {
             var imageIndexToDisplay = statusIsOneOf(['breakBeforeNext', 'waitingToStart']) ? 0 : 1
-            return <Image src={images[imageIndexToDisplay]} alt={exerciceToDisplay!.name} sx={{ ...fullSizeImageStyles, objectFit: 'contain' }} />
+            return <Image variant='image.redTint' src={images[imageIndexToDisplay]} alt={exerciceToDisplay!.name} sx={{ ...fullSizeImageStyles, objectFit: 'contain' }} />
         }
     }
 
-    var PlayStopButton = () => {
+    var ToolBar = () => {
+        var PlayStopButton = () => {
 
-        var Icon = (props: IconBaseProps) => {
-            if (isPaused) {
-                return <RiPlayLine {...props} />
-            } else {
-                return <RiPauseCircleLine {...props} />
+            var Icon = (props: IconBaseProps) => {
+                if (isPaused) {
+                    return <RiPlayLine {...props} />
+                } else {
+                    return <RiPauseCircleLine {...props} />
+                }
             }
+
+            var playOrPause = () => {
+                var newPause = not(isPaused)
+
+                setIsPaused(newPause)
+
+                if (newPause) {
+                    clearTimeout(timer)
+                } else {
+                    setCountDown(countdown)
+                }
+            }
+
+            return statusIsOneOf(['inProgress', 'breakBeforeNext', 'waitingToStart']) ? (
+                <Button
+                    onClick={playOrPause}
+                    p={0}
+                    variant='primary.hero.outline'
+                    display='flex'
+                    sx={{
+                        borderStyle: 'none',
+                        borderRadius: '50%'
+                    }}
+                >
+                    <Icon size={75} />
+                </Button>
+            ) : null
         }
 
-        var playOrPause = () => {
-            var newPause = not(isPaused)
+        var NextButton = () => {
 
-            setIsPaused(newPause)
-
-            if (newPause) {
+            var nextStep = () => {
                 clearTimeout(timer)
-            } else {
-                setCountDown(countdown)
+                goToNextStep()
             }
+
+            return statusIsOneOf(['inProgress', 'breakBeforeNext', 'waitingToStart']) ? (
+                <Button
+                    onClick={nextStep}
+                    my='auto'
+                    p={1}
+                    variant='primary.hero.outline'
+                    sx={{
+                        borderStyle: 'none',
+                        borderRadius: '50%'
+                    }}
+                >
+                    <RiSkipForwardLine size={40} />
+                </Button>
+            ) : null
         }
 
-        return statusIsOneOf(['inProgress', 'breakBeforeNext', 'waitingToStart']) ? (
-            <Button
-                onClick={playOrPause}
-                mx='auto'
-                p={0}
-                fontSize={5}
-                variant='primary.hero.outline'
-                display='flex'
-                sx={{
-                    borderStyle: 'none',
-                    borderRadius: '50%'
-                }}
-            >
-                <Icon size={75} />
-            </Button>
-        ) : null
+        return (
+            <Flex justifyContent="center">
+                <PlayStopButton/>
+                <NextButton/>
+            </Flex>
+        )
     }
 
     var ProgressBar = () => (
@@ -324,7 +354,9 @@ export function WorkoutPage(): ReactElement {
     var LaunchButton = () => {
         var launch = () => {
             if (!workout || isEmpty(workout)) {
-                setWorkout(createWorkoutFromExercises())
+                var createdWorkout = createWorkoutFromExercises()
+                setWorkout(createdWorkout)
+                workoutState.workout = createdWorkout.map(w => w.exercise).filter((e): e is Exercise => isNotNil(e))
             }
 
             goToNextStep()
@@ -356,7 +388,7 @@ export function WorkoutPage(): ReactElement {
                 <Flex width='100%' flexDirection='column'>
                     <ProgressBar />
                     <Timer />
-                    <PlayStopButton />
+                    <ToolBar />
                 </Flex>)
         }
     }

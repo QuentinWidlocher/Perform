@@ -29,16 +29,10 @@ export function ExerciseCard(ex: Exercise & { onClick: () => void, selected: boo
         </Box>
     )
 
-    var imageStyle: ImageProps = {
-        sx: {
-            filter: 'hue-rotate(120deg) saturate(1.5)'
-        }
-    }
-
     return (
         <Flex as='li' width={[1, 1 / 2, 1 / 3]} p={3} onClick={ex.onClick}>
             <Card variant="card.clickable" width='100%' height='100%'>
-                <Image variant='card.image' src={ex.images && ex.images[0]} sx={imageStyle.sx} />
+                <Image variant='card.image.redTint' src={ex.images && ex.images[0]} />
                 <Flex variant='card.body'>
                     <Flex flexDirection="column" flex={1}>
                         <Heading color='primary'>{ex.name} ({ex.duration}s)</Heading>
