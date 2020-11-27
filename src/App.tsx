@@ -7,7 +7,7 @@ import { RiHome2Line, RiSettings3Line } from 'react-icons/ri'
 import { MdFitnessCenter } from 'react-icons/md'
 import { ExercisesPage } from './pages/Exercises';
 import { Box } from 'rebass';
-import { WorkoutPage } from './pages/Workout';
+import { WorkoutPage } from './pages/Workout/Workout';
 
 export default function App() {
 
