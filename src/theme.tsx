@@ -137,9 +137,7 @@ export var theme = {
         width: '100%',
         height: '20rem',
         
-        redTint: {
-          filter: redTint
-        }
+        filter: redTint
       },
 
       clickable: {

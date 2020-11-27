@@ -1,12 +1,11 @@
-import { sum, map, prop, move, without, findIndex, remove } from "ramda"
+import { move, findIndex, remove } from "ramda"
 import React, { ReactElement } from "react"
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd"
 import { MdDragHandle } from "react-icons/md"
-import { RiCloseCircleLine, RiCloseLine, RiDeleteBinLine } from "react-icons/ri"
+import { RiCloseCircleLine } from "react-icons/ri"
 import { Flex, Box } from "rebass"
 import { theme } from "../../theme"
 import { Exercise, ExerciseListProps, getTagsFromExercice, getTotalDurationString } from "./Exercise"
-import { Tag } from "./Tag"
 
 export function ExerciseList({ exs, exsChange, displayTotal, canDelete, canReorder }: ExerciseListProps): ReactElement | null {
 
